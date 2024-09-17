@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <title>TechnoBrasa</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Tabela de Login</h2>
+        <form id="loginForm">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <!-- <input type="number" name="total" placeholder="Total" required> -->
+
+            <button type="submit">Entrar</button>
+        </form>
+        <h1>Minha Página</h1>
+        <form action="/pagaluno" method="get">
+        <button type="submit">Ir para outra página</button>
+    </form>
+    </div>
+    
+    <script>
+        // Função para login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Login bem-sucedido, redirecionar para a página de destino
+            window.location.href = '/pagaluno';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
+});
+
+    </script>
+</body>
+</html>

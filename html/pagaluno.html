@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CURSOS</title>
+    <link rel="stylesheet" href="/pagaluno.css">
+</head>
+
+<body>
+
+    <div id="sidebar" class="sidebar">
+        <!-- Conteúdo da barra lateral -->
+        <h2>TECNOBRASA</h2>
+        <div id="linha">
+
+        </div>
+        <ul>
+            <li><a href="/pagaluno.html">Cursos</a></li>
+            <li><a href="https://www.mapadaprova.com.br/questoes/informatica-basica/office-365"
+                    target="_blank">Questões</a></li>
+
+            <li><a href="/indexInicio.html">Sair</a></li>
+        </ul>
+    </div>
+
+    <div id="content">
+        <div id="boxmenu">
+            <img src="/barras.png" id="menu-toggle">
+            <h2>Meus Cursos</h2>
+        </div>
+
+        <!-- partial:index.partial.html -->
+        <div class="controls">
+
+            <button class="filter all" data-filter="all">Mostrar todos</button>
+            <button class="filter" data-filter=".office">Pacote Office</button>
+            <button class="filter" data-filter=".hardware">Computadores</button>
+        </div>
+
+        <div class="pager-list">
+            <!-- Pagination buttons will be generated here -->
+        </div>
+
+
+
+        <div id="Container" class="container">
+
+            <a class="mix word office" href="/word.html">
+                <img class="image" src="/microsoft-word.png">
+                <div class="overlay">
+                    <div class="hover-text">
+                        Word na Prática
+                    </div>
+                </div>
+            </a>
+
+            <a class="mix excel office" href="/excel.html">
+                <img class="image" src="/microsoft-excel.png">
+                <div class="overlay">
+                    <div class="hover-text">
+                        Excel na Prática
+                    </div>
+                </div>
+            </a>
+
+            <a class="mix powerpoint office" href="/ppt.html">
+                <img class="image" src="/microsoft-power-point.png">
+                <div class="overlay">
+                    <div class="hover-text">
+                        PowerPoint na Prática
+                    </div>
+                </div>
+            </a>
+
+            <a class="mix computadores hardware" href="/computador.html">
+                <img class="image" src="/computer-repair.png">
+                <div class="overlay">
+                    <div class="hover-text">
+                        Montagem e Manutenção de Computadores
+                    </div>
+                </div>
+            </a>
+
+            <div class="gap"></div>
+            <div class="gap"></div>
+        </div>
+    </div>
+    <!-- partial -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js'></script>
+    <script>
+        $(function () {
+            $('#Container').mixItUp();
+        });
+        $('#menu-toggle').on('click', function () {
+            // Alterna a classe 'active' no elemento #sidebar
+            $('#sidebar').toggleClass('active');
+
+            // Alterna a classe 'shifted' no elemento #content
+            $('#content').toggleClass('shifted');
+        });
+    </script>
+</body>
+
+</html>

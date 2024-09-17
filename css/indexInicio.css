@@ -1,0 +1,18 @@
+.carousel-item img {
+    height: 750px; /* ajuste o tamanho da imagem */
+    object-fit: cover; /* ajuste a imagem para cobrir o espaço */
+    border-radius: 1px; /* adicione um efeito de borda arredondada */
+  }
+
+  .carousel-item h5{
+    font-size: 70px;
+    font-family: Verdana;
+    color: #000000;
+  }
+  .carousel-item p{
+    font-size: 30px;
+  }
+  .dropdown-menu {
+    top: 100%;
+    transform: translateX(-50%);
+  }

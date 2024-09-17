@@ -1,0 +1,302 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+}
+
+body,
+button {
+  z-index: 1;
+  font-family: 'Helvetica Neue', arial, sans-serif;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 2%;
+}
+
+@media screen and (max-width: 450px) {
+  .controls {
+    display: none;
+  }
+}
+
+label {
+  font-weight: 300;
+  margin: 0 .4em 0 0;
+}
+
+button.filter {
+  margin: 0px;
+}
+
+button {
+  z-index: 700;
+  padding: 10px;
+  margin: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  border: none;
+  border-radius: 3px;
+  background-color: transparent;
+  color: #b3b0ab;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+
+button.active {
+  color: #ce6707;
+}
+
+button:focus {
+  outline: 0 none;
+}
+
+button+label {
+  margin-left: 1em;
+}
+
+.container {
+  padding: 2% 2% 0;
+  text-align: justify;
+  font-size: 0.1px;
+
+  -webkit-backface-visibility: hidden;
+}
+
+.container:after {
+  content: '';
+  display: inline-block;
+  width: 48%;
+}
+
+.container .mix,
+.container .gap {
+  display: inline-block;
+  width: 49%;
+}
+
+.container .mix {
+  position: relative;
+}
+
+.container .mix {
+  text-align: left;
+  margin-bottom: 0%;
+  display: none;
+}
+
+.container .mix:after {
+  content: attr(data-myorder);
+  color: white;
+  font-size: 16px;
+  display: none;
+  vertical-align: top;
+  /*  padding: 4% 6%; */
+  font-weight: 700;
+}
+
+.container .mix:before {
+  content: '';
+  display: none;
+  /* padding-top: 60%; */
+}
+
+@media all and (max-width: 449px) {
+
+  .container .mix,
+  .container .gap {
+    width: 100%;
+  }
+}
+
+@media all and (min-width: 450px) {
+
+  .container .mix,
+  .container .gap {
+    width: 48%;
+  }
+}
+
+@media all and (min-width: 900px) {
+
+  .container .mix,
+  .container .gap {
+    width: 32.5%;
+  }
+}
+
+a {
+  cursor: pointer;
+}
+
+img.image {
+  margin-top: 3%;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Hover Styling */
+.overlay {
+  margin-top: 3%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 96%;
+  width: 100%;
+  opacity: 0;
+  transition: .5s ease;
+  background-color: #000;
+}
+
+.mix:hover .overlay {
+  opacity: .65;
+}
+
+.hover-text {
+  color: #fff;
+  width: 100%;
+  font-family: 'adobe-garamond-pro';
+  font-style: italic;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 24px;
+  position: absolute;
+  text-transform: capitalize;
+  text-align: center;
+  letter-spacing: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%)
+}
+
+#boxmenu {
+  width: 100%;
+  height: 100px;
+  background-color: rgb(1, 150, 177);
+  box-shadow: 0px 10px #e69500;
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 0;
+  /* Remove margens indesejadas */
+  padding: 0;
+  /* Remove preenchimento */
+
+}
+
+#boxmenu img {
+  position: absolute;
+  width: 50px;
+  margin-left: 10px;
+  margin-top: 7px;
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 1100;
+}
+
+#boxmenu h2 {
+  position: absolute;
+  font-family: Arial;
+  font-size: 25px;
+  font-style: normal;
+  margin-left: 150px;
+  /* Ajuste a margem esquerda para 70px */
+  margin-top: 35px;
+  display: inline-block;
+  vertical-align: middle;
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+  /* Evita scroll horizontal indesejado */
+}
+
+#sidebar {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #5ca8b6cc;
+  color: white;
+  padding-top: 20px;
+  transition: transform 0.3s ease;
+  /* Transição suave */
+  transform: translateX(-250px);
+  /* Esconde a sidebar inicialmente */
+}
+
+#sidebar.active {
+  transform: translateX(0);
+  /* Mostra a sidebar */
+}
+
+.sidebar ul {
+  margin-top: 50px;
+  list-style-type: none;
+  padding: 2px;
+}
+
+.sidebar h2 {
+  margin-left: 20px;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  display: block;
+}
+
+.sidebar ul li a:hover {
+  background-color: #00708b;
+}
+
+#linha {
+  margin-top: 10px;
+  position: absolute;
+  background-color: #e69500;
+  width: 250px;
+  height: 10px;
+  z-index: 1100;
+}
+
+/* Menu toggle (ícone para abrir/fechar sidebar) */
+#menu-toggle {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+/* Estilos para o conteúdo principal */
+#content {
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+  /* Transição suave do conteúdo */
+  padding: 0px;
+}
+
+#content.shifted {
+  margin-left: 250px;
+  /* Empurra o conteúdo para a direita quando a sidebar está ativa */
+}
