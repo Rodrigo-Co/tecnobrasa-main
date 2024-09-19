@@ -71,7 +71,7 @@
         --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
 
         --bs-btn-font-weight: 600;
-        --bs-btn-color: var(--bs-white);
+        --bs-btn-color: var(--bs-white); 
         --bs-btn-bg: var(--bd-violet-bg);
         --bs-btn-border-color: var(--bd-violet-bg);
         --bs-btn-hover-color: var(--bs-white);
@@ -90,6 +90,38 @@
       .bd-mode-toggle .dropdown-menu .active .bi {
         display: block !important;
       }
+
+      .overlay {
+    display: none; /* Inicialmente oculto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+  }
+
+  .overlay-content {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
     </style>
 
     
@@ -112,9 +144,25 @@
       <label for="floatingPassword">Senha</label>
     </div>
     <button class="btn btn-primary w-100 py-2" type="submit">Entrar</button>
-    <a href="/indexCadastro.html" class="mt-5 mb-3 text-body-secondary">Ainda não tem uma uma conta? Cadastre-se!</a>
+    <div class="mt-1">
+      <a href="#" class="text-body-secondary" id="forgotPasswordLink">Esqueceu a senha?</a>
+    </div>
+    <br><br>
+    <a href="/indexCadastro.html" class="mt-5 mb-2 text-body-secondary">Ainda não tem uma uma conta? Cadastre-se!</a>
+    
   </form>
 </main>
+<div id="forgotPasswordOverlay" class="overlay">
+  <div class="overlay-content">
+    <span class="close-btn" id="closeOverlay">&times;</span>
+    <h2>Recuperar senha</h2>
+    <p>Digite seu e-mail para redefinir sua senha:</p>
+    <form id="resetPasswordForm">
+      <input type="email" class="form-control mb-2" id="resetEmail" placeholder="name@example.com" required>
+      <button type="submit" class="btn btn-primary w-100">Enviar</button>
+    </form>
+  </div>
+</div>
 <script>
   // Função para login
   document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -144,6 +192,32 @@
                     console.error('Erro:', error);
                 });
         });
+
+         // Abrir o overlay ao clicar no link
+  document.getElementById('forgotPasswordLink').addEventListener('click', function(event) {
+    event.preventDefault(); // Impedir o comportamento padrão do link
+    document.getElementById('forgotPasswordOverlay').style.display = 'block';
+  });
+
+  // Fechar o overlay ao clicar no botão de fechar
+  document.getElementById('closeOverlay').addEventListener('click', function() {
+    document.getElementById('forgotPasswordOverlay').style.display = 'none';
+  });
+
+  // Fechar o overlay ao clicar fora do conteúdo
+  window.addEventListener('click', function(event) {
+    if (event.target === document.getElementById('forgotPasswordOverlay')) {
+      document.getElementById('forgotPasswordOverlay').style.display = 'none';
+    }
+  });
+
+  // Submissão do formulário de recuperação de senha
+  document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // Aqui você pode adicionar a lógica para enviar o e-mail de recuperação de senha
+    alert('Instruções de redefinição de senha foram enviadas para ' + document.getElementById('resetEmail').value);
+    document.getElementById('forgotPasswordOverlay').style.display = 'none'; // Fechar o overlay
+  });
 </script>
 
     </body>
