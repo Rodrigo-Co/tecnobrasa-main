@@ -214,9 +214,29 @@
   // Submissão do formulário de recuperação de senha
   document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
     event.preventDefault();
-    // Aqui você pode adicionar a lógica para enviar o e-mail de recuperação de senha
-    alert('Instruções de redefinição de senha foram enviadas para ' + document.getElementById('resetEmail').value);
-    document.getElementById('forgotPasswordOverlay').style.display = 'none'; // Fechar o overlay
+    
+    const email = document.getElementById('resetEmail').value;
+
+    // Envia uma requisição para o servidor
+    fetch('/send-password-reset', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email })
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Instruções de redefinição de senha foram enviadas para ' + email);
+        document.getElementById('forgotPasswordOverlay').style.display = 'none'; // Fechar o overlay
+      } else {
+        alert('Erro ao enviar o e-mail de recuperação. Tente novamente mais tarde.');
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Ocorreu um erro. Por favor, tente novamente.');
+    });
   });
 </script>
 

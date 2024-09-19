@@ -4,6 +4,7 @@ const mysql = require('mysql2');
 const path = require('path');
 const mime = require('mime-types');
 const session = require('express-session');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = 3300;
@@ -26,6 +27,38 @@ db.connect((err) => {
     }
     console.log('Conectado ao banco de dados MySQL com Sucesso!');
 });
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'ttecnobrasa@gmail.com', // seu e-mail
+      pass: 'tecnobrasa1234'            // sua senha ou token de acesso
+    }
+  });
+
+  app.post('/send-password-reset', (req, res) => {
+    const { email } = req.body;
+  
+    if (!email) {
+      return res.status(400).send('E-mail é necessário');
+    }
+  
+    // Configuração do e-mail
+    const mailOptions = {
+      from: 'ttecnobrasa@gmail.com',
+      to: email,
+      subject: 'Redefinição de senha',
+      text: 'Clique no link abaixo para redefinir sua senha:\n\nredefinirsenha,com,br' + encodeURIComponent(email)
+    };
+  
+    // Enviar o e-mail
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Erro ao enviar o e-mail:', error);
+        return res.status(500).send('Erro ao enviar o e-mail');
+      }
+      console.log('E-mail enviado:', info.response);
+      res.status(200).send('E-mail de redefinição enviado com sucesso'); }); });
 
 // Servir arquivos estáticos (CSS, imagens, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
