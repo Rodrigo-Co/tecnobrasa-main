@@ -163,6 +163,14 @@
     </form>
   </div>
 </div>
+<div id="resetPasswordOverlay" style="display:none;">
+  <h2>Redefinir Senha</h2>
+  <form id="resetPasswordForm">
+      <input type="hidden" id="resetEmail">
+      <input type="password" id="novaSenha" placeholder="Digite sua nova senha">
+      <button type="submit">Redefinir Senha</button>
+  </form>
+</div>
 <script>
   // Função para login
   document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -238,6 +246,35 @@
       alert('Ocorreu um erro. Por favor, tente novamente.');
     });
   });
+  // Exibir o overlay de redefinição de senha
+  function showResetPasswordOverlay(email) {
+        document.getElementById('resetEmail').value = email;
+        document.getElementById('resetPasswordOverlay').style.display = 'block';
+    }
+
+    // Enviar nova senha
+    document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById('resetEmail').value;
+        const novaSenha = document.getElementById('novaSenha').value;
+
+        fetch('/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, novaSenha }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                // Fechar o overlay
+                document.getElementById('resetPasswordOverlay').style.display = 'none';
+            }
+        });
+    });
 </script>
 
     </body>

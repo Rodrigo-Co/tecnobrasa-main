@@ -5,6 +5,7 @@ const path = require('path');
 const mime = require('mime-types');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 const port = 3300;
@@ -32,33 +33,89 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'ttecnobrasa@gmail.com', // seu e-mail
-      pass: 'tecnobrasa1234'            // sua senha ou token de acesso
+      pass: 'j o x d p b g b e i g j f p l g'            // sua senha ou token de acesso
     }
   });
 
-  app.post('/send-password-reset', (req, res) => {
+ // Rota para enviar o token de redefinição de senha
+app.post('/send-password-reset', (req, res) => {
     const { email } = req.body;
-  
+
     if (!email) {
-      return res.status(400).send('E-mail é necessário');
+        return res.status(400).send('E-mail é necessário');
     }
-  
-    // Configuração do e-mail
-    const mailOptions = {
-      from: 'ttecnobrasa@gmail.com',
-      to: email,
-      subject: 'Redefinição de senha',
-      text: 'Clique no link abaixo para redefinir sua senha:\n\nredefinirsenha,com,br' + encodeURIComponent(email)
-    };
-  
-    // Enviar o e-mail
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Erro ao enviar o e-mail:', error);
-        return res.status(500).send('Erro ao enviar o e-mail');
-      }
-      console.log('E-mail enviado:', info.response);
-      res.status(200).send('E-mail de redefinição enviado com sucesso'); }); });
+
+    // Verificar se o email está cadastrado
+    const queryVerificar = 'SELECT * FROM usuario WHERE email = ?';
+    db.query(queryVerificar, [email], (err, results) => {
+        if (err) {
+            throw err;
+        }
+        if (results.length === 0) {
+            return res.status(404).send('E-mail não encontrado.');
+        }
+
+        // Gerar um token aleatório
+        const token = crypto.randomBytes(20).toString('hex');
+        const expiracao = Date.now() + 3600000; // Token válido por 1 hora
+
+        // Inserir o token no banco de dados
+        const queryInsert = 'UPDATE usuario SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?';
+        db.query(queryInsert, [token, expiracao, email], (err, result) => {
+            if (err) {
+                throw err;
+            }
+
+            // Configuração do e-mail
+            const mailOptions = {
+                from: 'ttecnobrasa@gmail.com',
+                to: email,
+                subject: 'Redefinição de senha',
+                text: `Você solicitou uma redefinição de senha. Use o token abaixo para redefinir sua senha:\n\nToken: ${token}\n\nO token é válido por 1 hora.`
+            };
+
+            // Enviar o e-mail
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Erro ao enviar o e-mail:', error);
+                    return res.status(500).send('Erro ao enviar o e-mail');
+                }
+                console.log('E-mail enviado:', info.response);
+                res.status(200).send('E-mail de redefinição enviado com sucesso');
+            });
+        });
+    });
+});
+// Rota para verificar o token
+app.post('/verify-token', (req, res) => {
+    const { email, token } = req.body;
+
+    const query = 'SELECT * FROM usuario WHERE email = ? AND resetPasswordToken = ? AND resetPasswordExpires > ?';
+    db.query(query, [email, token, Date.now()], (err, results) => {
+        if (err) {
+            throw err;
+        }
+
+        if (results.length === 0) {
+            return res.status(400).send('Token inválido ou expirado.');
+        }
+
+        res.status(200).send('Token verificado com sucesso. Redefina sua senha.');
+    });
+});
+// Rota para redefinir a senha
+app.post('/reset-password', (req, res) => {
+    const { email, novaSenha } = req.body;
+
+    const queryUpdate = 'UPDATE usuario SET senha = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE email = ?';
+    db.query(queryUpdate, [novaSenha, email], (err, result) => {
+        if (err) {
+            throw err;
+        }
+
+        res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+    });
+});
 
 // Servir arquivos estáticos (CSS, imagens, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
