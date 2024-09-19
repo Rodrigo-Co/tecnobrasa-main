@@ -57,13 +57,14 @@ app.post('/send-password-reset', (req, res) => {
 
         // Gerar um token aleatório
         const token = crypto.randomBytes(20).toString('hex');
-        const expiracao = Date.now() + 3600000; // Token válido por 1 hora
+        const expiracao = new Date(Date.now() + 3600000); // Token válido por 1 hora
 
         // Inserir o token no banco de dados
         const queryInsert = 'UPDATE usuario SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?';
         db.query(queryInsert, [token, expiracao, email], (err, result) => {
             if (err) {
-                throw err;
+                console.error('Erro ao atualizar o token de redefinição de senha:', err);
+                return res.status(500).json({ message: 'Erro ao processar o pedido de redefinição de senha.' });
             }
 
             // Configuração do e-mail
