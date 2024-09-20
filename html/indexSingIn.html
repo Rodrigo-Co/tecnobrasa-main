@@ -190,6 +190,7 @@
   </div>
 </div>
 <script>
+  let emailRecuperacao; // Variável global para armazenar o e-mail
   // Função para login
   document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -238,29 +239,30 @@
       });
 
       // Submissão do formulário de recuperação de senha
-      document.getElementById('sendResetEmailForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const email = document.getElementById('resetEmail').value;
+document.getElementById('sendResetEmailForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const email = document.getElementById('resetEmail').value;
 
-        fetch('/send-password-reset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email })
-        })
-        .then(response => {
-          if (response.ok) {
-            alert('Instruções de redefinição de senha foram enviadas para ' + email);
-            document.getElementById('forgotPasswordOverlay').style.display = 'none';
-            showConfirmTokenOverlay(); // Abrir o overlay de confirmação do token
-          } else {
-            alert('Erro ao enviar o e-mail de recuperação. Tente novamente mais tarde.');
-          }
-        })
-        .catch(error => {
-          console.error('Erro:', error);
-          alert('Ocorreu um erro. Por favor, tente novamente.');
-        });
-      });
+  fetch('/send-password-reset', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('Instruções de redefinição de senha foram enviadas para ' + email);
+      document.getElementById('forgotPasswordOverlay').style.display = 'none';
+      emailRecuperacao = email; // Armazenando o e-mail para uso posterior
+      showConfirmTokenOverlay(); // Abrir o overlay de confirmação do token
+    } else {
+      alert('Erro ao enviar o e-mail de recuperação. Tente novamente mais tarde.');
+    }
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+    alert('Ocorreu um erro. Por favor, tente novamente.');
+  });
+});
 
       // Exibir o overlay de confirmação do token
       function showConfirmTokenOverlay() {
@@ -268,30 +270,31 @@
       }
 
       // Submissão do formulário de confirmação do token
-      document.getElementById('confirmTokenForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const token = document.getElementById('tokenInput').value;
+document.getElementById('confirmTokenForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const token = document.getElementById('tokenInput').value;
 
-        fetch('/verify-token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: token })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('confirmTokenOverlay').style.display = 'none';
-            showResetPasswordOverlay(data.email);
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Erro:', error);
-          alert('Ocorreu um erro. Por favor, tente novamente.');
-        });
-      });
-
+  fetch('/verify-token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token, email: emailRecuperacao }) // Usar o e-mail armazenado
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('Token verificado com sucesso');
+      document.getElementById('confirmTokenOverlay').style.display = 'none';
+      showResetPasswordOverlay();
+    } else {
+      console.error('Erro:', data.error);
+      alert(data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+    alert('Ocorreu um erro. Por favor, tente novamente.');
+  });
+});
       // Fechar o overlay de confirmação do token
       document.getElementById('closeTokenOverlay').addEventListener('click', function() {
         document.getElementById('confirmTokenOverlay').style.display = 'none';
@@ -306,29 +309,33 @@
 
       // Exibir o overlay de redefinição de senha
       function showResetPasswordOverlay(email) {
-        document.getElementById('resetEmailForReset').value = email;
+        document.getElementById('resetEmail').value = email;
         document.getElementById('resetPasswordOverlay').style.display = 'block';
       }
 
       // Enviar nova senha
-      document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const email = document.getElementById('resetEmailForReset').value;
-        const novaSenha = document.getElementById('novaSenha').value;
+document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const novaSenha = document.getElementById('novaSenha').value;
 
-        fetch('/reset-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, novaSenha }),
-        })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.message);
-          if (data.success) {
-            document.getElementById('resetPasswordOverlay').style.display = 'none';
-          }
-        });
-      });
+  // Usar o e-mail armazenado
+  fetch('/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: emailRecuperacao, novaSenha: novaSenha }) // Enviar o e-mail e a nova senha
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Resposta do servidor:', data);
+    alert(data.message);
+    if (data.success) {
+      document.getElementById('resetPasswordOverlay').style.display = 'none';
+    }
+  })
+  .catch(error => {
+    console.error('Erro na redefinição de senha:', error);
+  });
+});
 
       // Fechar o overlay de redefinição de senha
       document.getElementById('closeResetOverlay').addEventListener('click', function() {

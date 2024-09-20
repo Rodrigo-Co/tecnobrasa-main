@@ -6,6 +6,8 @@ const mime = require('mime-types');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+
 
 const app = express();
 const port = 3300;
@@ -18,7 +20,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -58,6 +60,8 @@ app.post('/send-password-reset', (req, res) => {
         // Gerar um token aleatório
         const token = crypto.randomBytes(20).toString('hex');
         const expiracao = new Date(Date.now() + 3600000); // Token válido por 1 hora
+        console.log('Token enviado:', token);
+        console.log('Token armazenado:', results[0].resetPasswordToken);
 
         // Inserir o token no banco de dados
         const queryInsert = 'UPDATE usuario SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE email = ?';
@@ -87,6 +91,7 @@ app.post('/send-password-reset', (req, res) => {
         });
     });
 });
+
 // Rota para verificar o token
 app.post('/verify-token', (req, res) => {
     const { email, token } = req.body;
@@ -94,27 +99,52 @@ app.post('/verify-token', (req, res) => {
     const query = 'SELECT * FROM usuario WHERE email = ? AND resetPasswordToken = ? AND resetPasswordExpires > ?';
     db.query(query, [email, token, Date.now()], (err, results) => {
         if (err) {
-            throw err;
+            return res.status(500).json({ error: 'Erro no servidor' });
         }
 
         if (results.length === 0) {
-            return res.status(400).send('Token inválido ou expirado.');
+            return res.status(400).json({ error: 'Token inválido ou expirado.' });
         }
 
-        res.status(200).send('Token verificado com sucesso. Redefina sua senha.');
+        res.status(200).json({ success: true, message: 'Token verificado com sucesso. Redefina sua senha.' });
     });
 });
-// Rota para redefinir a senha
+// Rota para redefinir a senha com criptografia
 app.post('/reset-password', (req, res) => {
     const { email, novaSenha } = req.body;
 
-    const queryUpdate = 'UPDATE usuario SET senha = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE email = ?';
-    db.query(queryUpdate, [novaSenha, email], (err, result) => {
+    // Log para ver o que está sendo recebido
+    console.log('E-mail recebido:', email);
+    console.log('Nova senha recebida:', novaSenha);
+
+    if (!email || !novaSenha) {
+        return res.status(400).json({ message: 'E-mail e nova senha são necessários.' });
+    }
+
+    // Gerar um hash da nova senha
+    bcrypt.hash(novaSenha, 10, (err, hash) => {
         if (err) {
-            throw err;
+            console.error('Erro ao criptografar a senha:', err);
+            return res.status(500).json({ message: 'Erro ao criptografar a senha.' });
         }
 
-        res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+        // Atualizar a senha no banco de dados
+        const queryUpdate = 'UPDATE usuario SET senha = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL WHERE email = ?';
+        db.query(queryUpdate, [hash, email], (err, result) => {
+            if (err) {
+                console.error('Erro ao atualizar a senha no banco de dados:', err);
+                return res.status(500).json({ message: 'Erro ao redefinir a senha.' });
+            }
+
+            // Logar o resultado da query para depuração
+            console.log('Resultado da query:', result);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Usuário não encontrado.' });
+            }
+
+            res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+        });
     });
 });
 
@@ -178,52 +208,69 @@ app.get('/getUsuarioId', (req, res) => {
     }
 });
 
-// Rota para login de dados
+// Rota para login de dados com verificação da senha criptografada
 app.post('/login', (req, res) => {
     const { email, senha } = req.body;
-    const queryVerificar = 'SELECT * FROM usuario WHERE email = ? AND senha = ?';
-    db.query(queryVerificar, [email, senha], (err, results) => {
+
+    // Verificar se o e-mail existe
+    const queryVerificar = 'SELECT * FROM usuario WHERE email = ?';
+    db.query(queryVerificar, [email], (err, results) => {
         if (err) {
             throw err;
         }
+
         if (results.length > 0) {
-            req.session.usuario = results[0];
-            res.json({ success: true });
-        } else {
-            const queryVerificarEmail = 'SELECT * FROM usuario WHERE email = ?';
-            db.query(queryVerificarEmail, [email], (err, results) => {
+            const usuario = results[0];
+
+            // Comparar a senha fornecida com a senha criptografada no banco de dados
+            bcrypt.compare(senha, usuario.senha, (err, isMatch) => {
                 if (err) {
-                    throw err;
+                    console.error('Erro ao comparar senhas:', err);
+                    return res.status(500).json({ message: 'Erro no servidor.' });
                 }
-                if (results.length > 0) {
-                    res.json({ success: false, message: 'Senha incorreta!' }); // Senha incorreta
+
+                if (isMatch) {
+                    req.session.usuario = usuario; // Armazena o usuário na sessão
+                    res.json({ success: true });
                 } else {
-                    res.json({ success: false, message: 'Dados não encontrados!' }); // Email e senha incorretos
+                    res.json({ success: false, message: 'Senha incorreta!' }); // Senha incorreta
                 }
             });
+        } else {
+            res.json({ success: false, message: 'E-mail não encontrado!' }); // E-mail não cadastrado
         }
     });
 });
-
-// Rota para cadastrar dados
+// Rota para cadastrar dados com senha criptografada
 app.post('/cadastrar', (req, res) => {
     const { nome, email, senha } = req.body;
+
+    // Verificar se o e-mail já está cadastrado
     const queryVerificar = 'SELECT * FROM usuario WHERE email = ?';
     db.query(queryVerificar, [email], (err, results) => {
         if (err) {
             throw err;
         }
         if (results.length > 0) {
-            res.json({ message: 'Usuário já cadastrado!' });
-        } else {
+            return res.json({ message: 'Usuário já cadastrado!' });
+        }
+
+        // Criptografar a senha antes de armazená-la
+        bcrypt.hash(senha, 10, (err, hash) => {
+            if (err) {
+                console.error('Erro ao criptografar a senha:', err);
+                return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
+            }
+
+            // Inserir o novo usuário com a senha criptografada
             const query = 'INSERT INTO usuario (nome, email, senha) VALUES (?, ?, ?)';
-            db.query(query, [nome, email, senha], (err, results) => {
+            db.query(query, [nome, email, hash], (err, results) => {
                 if (err) {
                     throw err;
                 }
                 res.json({ message: 'Dados cadastrados com sucesso!' });
             });
-        }
+        });
     });
 });
 
