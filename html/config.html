@@ -15,19 +15,21 @@
     <h1 class="page-title">Conta</h1>
     <div class="settings-section">
       <h2 class="settings-title">Meu Perfil</h2>
-      <form class="form my-form">
+      <form class="form my-form" id="imageUploadForm" enctype="multipart/form-data" action="/upload" method="POST">
         <div class="img-upload-container">
-          <label class="img-upload btn btn-bwm" style="background-image: url(&quot;/profile-placeholder.jpg&quot;);">
-            <input type="file" accept=".jpg, .png, .jpeg, .gif" value="">
-          </label>
-          <h4>Altere sua foto de perfil</h4>
-          <div class="img-preview-container">
-            <div class="img-preview" style="background-image: url('user.png');">
+          <label class="img-upload btn btn-bwm" id="imageLabel" for="profileImage">
+            <div class="img-preview-container">
+              <div class="img-preview" id="imgPreview">
+                <img src="userform.png" alt="Preview" id="imagePreviewElement">
+              </div>
             </div>
-          </div>
+            <i class="fas fa-upload"></i> Escolher Imagem
+          </label>
+          <input type="file" accept=".jpg, .png, .jpeg, .gif" name="profileImage" id="profileImage" style= "display: none;">
+          <h4>Altere sua foto de perfil</h4>
         </div>
         <div class="form-submit">
-          <button class="btn button full" type="submit" disabled="">Salve sua foto</button>
+          <button class="btn button full" type="submit">Salve sua foto</button>
         </div>
       </form>
     </div>
@@ -68,6 +70,23 @@
 </div>
 </div>
 <!-- partial -->
-  
+<script>
+  const inputElement = document.getElementById('profileImage');
+  const previewElement = document.getElementById('imagePreviewElement');
+
+inputElement.addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    previewElement.src = e.target.result;
+  };
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+});
+
+</script> 
 </body>
 </html>

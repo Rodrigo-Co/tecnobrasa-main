@@ -7,10 +7,18 @@ const session = require('express-session');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const port = 3300;
+
+// Verifica se o diretório 'uploads' existe e, se não existir, cria.
+const uploadDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Configuração do body-parser
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,6 +38,48 @@ db.connect((err) => {
     }
     console.log('Conectado ao banco de dados MySQL com Sucesso!');
 });
+
+// Defina o diretório onde as imagens serão salvas
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)); // Nomeia o arquivo com um timestamp único
+    }
+  });
+  
+  const upload = multer({
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        const filetypes = /jpeg|jpg|png|gif/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Somente imagens são permitidas!'));
+        }
+    }
+    });
+
+  // Rota para o upload de imagem
+app.post('/upload', upload.single('profileImage'), (req, res) => {
+    if (!req.file) {
+      return res.status(400).send('Nenhuma imagem foi enviada.');
+    }
+  
+    // Aqui você pode salvar o caminho da imagem no banco de dados
+    const imagePath = req.file.path;
+    
+    // Simulação de salvamento no banco de dados
+    console.log(`Imagem salva em: ${imagePath}`);
+    
+    // Retorna uma resposta ao cliente
+    res.send(`Imagem enviada com sucesso: <a href="/${imagePath}">${imagePath}</a>`);
+  });
+
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -155,6 +205,7 @@ app.use(express.static(path.join(__dirname, 'assets')));
 app.use(express.static(path.join(__dirname, 'img')));
 app.use(express.static(path.join(__dirname, 'html')));
 app.use(express.static(path.join(__dirname, 'video')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 console.log('Servindo arquivos estáticos a partir da pasta public');
 
 // Armazenar informações do usuario
@@ -379,13 +430,31 @@ app.get('/getData', (req, res) => {
 app.put('/update/:idusuario', (req, res) => {
     const { idusuario } = req.params;
     const { nome, email, senha } = req.body;
-    const query = 'UPDATE usuario SET nome = ?, email = ?, senha = ? WHERE idusuario = ?';
-    db.query(query, [nome, email, senha, idusuario], (err, result) => {
-        if (err) {
-            throw err;
-        }
-        res.json({ message: 'Dados atualizados com sucesso!' });
-    });
+
+    if (senha) {
+        bcrypt.hash(senha, 10, (err, hash) => {
+            if (err) {
+                return res.status(500).json({ message: 'Erro ao criptografar a senha.' });
+            }
+
+            const query = 'UPDATE usuario SET nome = ?, email = ?, senha = ? WHERE idusuario = ?';
+            db.query(query, [nome, email, hash, idusuario], (err, result) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Erro ao atualizar os dados.' });
+                }
+                res.json({ message: 'Dados atualizados com sucesso!' });
+            });
+        });
+    } else {
+        // Se a senha não foi alterada, não deve ser atualizada
+        const query = 'UPDATE usuario SET nome = ?, email = ? WHERE idusuario = ?';
+        db.query(query, [nome, email, idusuario], (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'Erro ao atualizar os dados.' });
+            }
+            res.json({ message: 'Dados atualizados com sucesso!' });
+        });
+    }
 });
 
 // Rota para deletar dados
