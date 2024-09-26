@@ -20,16 +20,20 @@
           <label class="img-upload btn btn-bwm" id="imageLabel" for="profileImage">
             <div class="img-preview-container">
               <div class="img-preview" id="imgPreview">
-                <img src="userform.png" alt="Preview" id="imagePreviewElement">
+                <img src="default-profile.png" alt="Preview" id="imagePreviewElement"> <!-- Coloque uma imagem padrão -->
               </div>
             </div>
             <i class="fas fa-upload"></i> Escolher Imagem
           </label>
           <input type="file" accept=".jpg, .png, .jpeg, .gif" name="profileImage" id="profileImage" style= "display: none;">
-          <h4>Altere sua foto de perfil</h4>
+          <h4 id="changeProfileText">Altere sua foto de perfil</h4> <!-- Adicionado id -->
         </div>
         <div class="form-submit">
           <button class="btn button full" type="submit">Salve sua foto</button>
+        </div>
+        <!-- Balão de confirmação -->
+        <div id="confirmationBalloon" style="display: none; margin-top: 10px; padding: 10px; background-color: #4CAF50; color: white; border-radius: 5px;">
+          Foto de perfil atualizada com sucesso!
         </div>
       </form>
     </div>
@@ -73,20 +77,77 @@
 <script>
   const inputElement = document.getElementById('profileImage');
   const previewElement = document.getElementById('imagePreviewElement');
+  const changeProfileText = document.getElementById('changeProfileText'); // Referência ao texto
+  const imageUploadForm = document.getElementById('imageUploadForm');
+  const confirmationBalloon = document.getElementById('confirmationBalloon');
 
-inputElement.addEventListener('change', function(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
+  // Preview da imagem no navegador
+  inputElement.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
-  reader.onload = function(e) {
-    previewElement.src = e.target.result;
+    reader.onload = function(e) {
+      previewElement.src = e.target.result;
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Simular clique no input ao clicar no texto "Altere sua foto de perfil"
+  changeProfileText.addEventListener('click', function() {
+    inputElement.click();
+  });
+
+  // Enviar o formulário via AJAX e mostrar o balão de confirmação
+  imageUploadForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Evitar o envio padrão do formulário
+
+    const formData = new FormData(imageUploadForm);
+
+    fetch('/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Mostrar o balão de confirmação
+        confirmationBalloon.style.display = 'block';
+        // Ocultar o balão após 3 segundos
+        setTimeout(() => {
+          confirmationBalloon.style.display = 'none';
+        }, 3000);
+      } else {
+        alert('Ocorreu um erro ao salvar a imagem.');
+      }
+    })
+    .catch(error => {
+      alert('Erro ao tentar enviar a imagem.');
+      console.error('Erro:', error);
+    });
+  });
+
+  // Carregar a imagem do perfil quando a página carregar
+  window.onload = function() {
+    fetch('/user/profile-image')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro na autenticação ou na requisição de imagem.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.imageUrl) {
+          previewElement.src = `${data.imageUrl}?t=${new Date().getTime()}`;
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao carregar a imagem do usuário:', error);
+      });
   };
-
-  if (file) {
-    reader.readAsDataURL(file);
-  }
-});
-
+  
 </script> 
 </body>
 </html>

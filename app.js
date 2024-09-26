@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -38,6 +38,12 @@ db.connect((err) => {
     }
     console.log('Conectado ao banco de dados MySQL com Sucesso!');
 });
+app.use(session({
+    secret: 'segredo',
+    resave: false,    // Certifique-se de que está configurado corretamente
+    saveUninitialized: true, // Mantém a sessão, mesmo sem modificações
+    cookie: { secure: false } // Deve estar como "false" se você estiver testando em HTTP (não HTTPS)
+}));
 
 // Defina o diretório onde as imagens serão salvas
 const storage = multer.diskStorage({
@@ -45,7 +51,8 @@ const storage = multer.diskStorage({
       cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname)); // Nomeia o arquivo com um timestamp único
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname)); // gera um nome único
     }
   });
   
@@ -65,21 +72,60 @@ const storage = multer.diskStorage({
     });
 
   // Rota para o upload de imagem
-app.post('/upload', upload.single('profileImage'), (req, res) => {
-    if (!req.file) {
-      return res.status(400).send('Nenhuma imagem foi enviada.');
+  app.post('/upload', upload.single('profileImage'), (req, res) => {
+    // Verifique se o usuário está logado
+    if (!req.session.usuario) {
+        return res.status(401).json({ success: false, message: 'Você precisa estar logado para fazer upload de imagens.' });
     }
-  
-    // Aqui você pode salvar o caminho da imagem no banco de dados
-    const imagePath = req.file.path;
-    
-    // Simulação de salvamento no banco de dados
-    console.log(`Imagem salva em: ${imagePath}`);
-    
-    // Retorna uma resposta ao cliente
-    res.send(`Imagem enviada com sucesso: <a href="/${imagePath}">${imagePath}</a>`);
-  });
 
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: 'Nenhuma imagem foi enviada.' });
+    }
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+    const userId = req.session.usuario.idusuario; // Certifique-se de que o ID do usuário está na sessão
+
+    // Atualiza o caminho da imagem no banco de dados para o usuário logado
+    const queryUpdateImage = 'UPDATE usuario SET profileImage = ? WHERE idusuario = ?';
+    db.query(queryUpdateImage, [imageUrl, userId], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar a imagem no banco de dados:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao salvar a imagem no banco de dados.' });
+        }
+
+        // Enviar uma resposta de sucesso com a URL da imagem
+        res.json({ success: true, imageUrl: imageUrl, message: 'Imagem enviada com sucesso.' });
+    });
+});
+
+app.get('/user/profile-image', (req, res) => {
+    // Verifica se o usuário está logado
+    if (!req.session.usuario) {
+        return res.status(401).send('Você precisa estar logado para acessar essa imagem.');
+    }
+
+    const userId = req.session.usuario.idusuario; // Certifique-se de que o ID do usuário está na sessão
+
+    // Consulta o banco de dados para obter o caminho da imagem do perfil
+    const queryGetImage = 'SELECT profileImage FROM usuario WHERE idusuario = ?';
+    
+    db.query(queryGetImage, [userId], (err, result) => {
+        if (err) {
+            console.error('Erro ao buscar a imagem no banco de dados:', err);
+            return res.status(500).send('Erro ao buscar a imagem.');
+        }
+
+        // Verifica se o usuário tem uma imagem de perfil
+        if (result.length > 0 && result[0].profileImage) {
+            const userImageURL = result[0].profileImage; // URL da imagem salva no banco
+            return res.json({ imageUrl: userImageURL });
+        } else {
+            // Retorna uma URL de imagem padrão caso o usuário não tenha uma imagem
+            const defaultImageURL = '/uploads/default-profile.png';
+            return res.json({ imageUrl: defaultImageURL });
+        }
+    });
+});
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -208,13 +254,7 @@ app.use(express.static(path.join(__dirname, 'video')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 console.log('Servindo arquivos estáticos a partir da pasta public');
 
-// Armazenar informações do usuario
-app.use(session({
-    secret: 'segredo',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-}));
+
 
 // Servir o arquivo HTML
 app.get('/', (req, res) => {
@@ -237,6 +277,7 @@ app.get('/video', (req, res) => {
 
 
 app.get('/pagaluno', (req, res) => {
+    console.log('Sessão atual:', req.session); // Adicione este log
     if (!req.session.usuario) {
         res.redirect('/login');
         return;
@@ -279,12 +320,14 @@ app.post('/login', (req, res) => {
                     console.error('Erro ao comparar senhas:', err);
                     return res.status(500).json({ message: 'Erro no servidor.' });
                 }
-
+            
                 if (isMatch) {
+                    console.log('Usuário logado:', usuario); // Log do usuário logado
                     req.session.usuario = usuario; // Armazena o usuário na sessão
                     res.json({ success: true });
                 } else {
-                    res.json({ success: false, message: 'Senha incorreta!' }); // Senha incorreta
+                    console.log('Senha incorreta'); // Log para senhas incorretas
+                    res.json({ success: false, message: 'Senha incorreta!' });
                 }
             });
         } else {
