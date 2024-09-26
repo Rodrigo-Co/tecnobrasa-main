@@ -68,9 +68,10 @@
   }
   
   .sidebar h2 {
-    margin-left: 20px;
+    font-size: 25px !important;
+    margin-top: 50px ;
+    margin-left: 36px !important;
   }
-  
   .sidebar ul li a {
     color: white;
     text-decoration: none;
@@ -81,16 +82,53 @@
   .sidebar ul li a:hover {
     background-color: #00708b;
   }
-  
-  #linha {
-    margin-top: 10px;
-    position: absolute;
-    background-color: #e69500;
-    width: 250px;
-    height: 10px;
-    z-index: 1100;
+  #infouser {
+    display: flex;            /* Usar Flexbox */
+    flex-direction: column;       /* Alinhar os itens na vertical (coluna) */
+    align-items: center;          /* Centraliza horizontalmente os elementos */
+    justify-content: center;      /* Centraliza verticalmente os elementos */
+    padding: 10px;                /* Adiciona um espaço ao redor */
+    text-align: center;           /* Centraliza o texto (nome do usuário) */
+  }
+  #imguser{
+    display: flex;                /* Usar Flexbox para centralizar a imagem */
+    justify-content: center;      /* Centraliza a imagem horizontalmente */
+    width: 100%; 
+  }
+  #imguser img {
+    width: 120px;                 /* Define a largura da imagem */
+    height: 120px;                /* Define a altura da imagem */
+    border-radius: 50%;           /* Torna a imagem circular */
+    object-fit: cover;            /* Garante que a imagem se ajuste ao espaço, cortando se necessário */      
   }
   
+  #nomeusuario {
+    font-size: 25px;              /* Tamanho da fonte para o nome */
+    font-weight: bold;            /* Deixa o texto em negrito */
+    color: #333;                  /* Cor do texto */
+    margin: 0;                    /* Remove margens adicionais */
+    width: 100%; 
+    text-align: center !important;
+    position: relative !important;
+    left: -8%;
+  }
+  
+ #linha {
+  margin-top: 12.5px;
+  position: absolute;
+  background-color: #e69500;
+  width: 250px;
+  height: 10px;
+  z-index: 1100;
+}
+#linha2 {
+  margin-top: 420px !important;
+  position: absolute;
+  background-color: #e69500;
+  width: 250px;
+  height: 10px;
+  z-index: 1100;
+}
   /* Estilo para o botão de menu toggle */
   #menu-toggle {
     cursor: pointer;
@@ -193,4 +231,3 @@
     max-width: 500px; /* Ajusta a largura máxima do textarea */
     margin-top: 10px; /* Espaçamento superior para melhorar o layout */
   }
-  

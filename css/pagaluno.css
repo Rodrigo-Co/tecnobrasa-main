@@ -166,9 +166,7 @@ img.image {
   color: #fff;
   width: 100%;
   font-family: 'adobe-garamond-pro';
-  font-style: italic;
   font-weight: 600;
-  text-decoration: underline;
   font-size: 24px;
   position: absolute;
   text-transform: capitalize;
@@ -254,7 +252,9 @@ body {
 }
 
 .sidebar h2 {
-  margin-left: 20px;
+  font-size: 25px;
+  margin-top: 50px;
+  margin-left: 30px;
 }
 
 .sidebar ul li a {
@@ -267,9 +267,44 @@ body {
 .sidebar ul li a:hover {
   background-color: #00708b;
 }
+#infouser {
+  display: flex;                /* Usar Flexbox */
+  flex-direction: column;       /* Alinhar os itens na vertical (coluna) */
+  align-items: center;          /* Centraliza horizontalmente os elementos */
+  justify-content: center;      /* Centraliza verticalmente os elementos */
+  padding: 10px;                /* Adiciona um espaço ao redor */
+  text-align: center;           /* Centraliza o texto (nome do usuário) */
+}
+#imguser{
+  display: flex;                /* Usar Flexbox para centralizar a imagem */
+  justify-content: center;      /* Centraliza a imagem horizontalmente */
+  width: 100%; 
+}
+#imguser img {
+  width: 120px;                 /* Define a largura da imagem */
+  height: 120px;                /* Define a altura da imagem */
+  border-radius: 50%;           /* Torna a imagem circular */
+  object-fit: cover;            /* Garante que a imagem se ajuste ao espaço, cortando se necessário */      
+}
 
+#nomeusuario {
+  font-size: 25px;              /* Tamanho da fonte para o nome */
+  font-weight: bold;            /* Deixa o texto em negrito */
+  color: #333;                  /* Cor do texto */
+  margin: 0;                    /* Remove margens adicionais */
+  width: 100%; 
+  text-align: center; 
+}
 #linha {
-  margin-top: 10px;
+  margin-top: 12.5px;
+  position: absolute;
+  background-color: #e69500;
+  width: 250px;
+  height: 10px;
+  z-index: 1100;
+}
+#linha2 {
+  margin-top: 450px;
   position: absolute;
   background-color: #e69500;
   width: 250px;
@@ -299,4 +334,19 @@ body {
 #content.shifted {
   margin-left: 250px;
   /* Empurra o conteúdo para a direita quando a sidebar está ativa */
+}
+.favorite-button {
+  position: absolute;  /* Certifique-se de que o botão fique acima do overlay */
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;         /* Garante que o botão fique acima de outros elementos */
+  background-color: #f0f0f0;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.favorite-button:hover {
+  background-color: #e0e0e0;  /* Efeito de hover para melhorar a usabilidade */
 }

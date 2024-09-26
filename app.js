@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'rodrigo', // Substitua pela sua senha do MySQL
+    password: 'cimatec', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -98,31 +98,35 @@ const storage = multer.diskStorage({
     });
 });
 
-app.get('/user/profile-image', (req, res) => {
-    // Verifica se o usuário está logado
+app.get('/user/profile', (req, res) => {
+    // Verifique se o usuário está logado
     if (!req.session.usuario) {
-        return res.status(401).send('Você precisa estar logado para acessar essa imagem.');
+        return res.status(401).json({ success: false, message: 'Você precisa estar logado.' });
     }
 
-    const userId = req.session.usuario.idusuario; // Certifique-se de que o ID do usuário está na sessão
+    const userId = req.session.usuario.idusuario;
 
-    // Consulta o banco de dados para obter o caminho da imagem do perfil
-    const queryGetImage = 'SELECT profileImage FROM usuario WHERE idusuario = ?';
-    
-    db.query(queryGetImage, [userId], (err, result) => {
+    // Consulta o banco de dados para obter o nome e a imagem de perfil
+    const queryGetUser = 'SELECT nome, profileImage FROM usuario WHERE idusuario = ?';
+
+    db.query(queryGetUser, [userId], (err, result) => {
         if (err) {
-            console.error('Erro ao buscar a imagem no banco de dados:', err);
-            return res.status(500).send('Erro ao buscar a imagem.');
+            console.error('Erro ao buscar o usuário no banco de dados:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao buscar o usuário.' });
         }
 
-        // Verifica se o usuário tem uma imagem de perfil
-        if (result.length > 0 && result[0].profileImage) {
-            const userImageURL = result[0].profileImage; // URL da imagem salva no banco
-            return res.json({ imageUrl: userImageURL });
+        if (result.length > 0) {
+            const userData = result[0];
+            const userName = userData.nome;
+            const userImage = userData.profileImage || '/uploads/default-profile.png'; // Se não houver imagem, usa uma padrão
+
+            return res.json({
+                success: true,
+                nome: userName,
+                profileImage: userImage
+            });
         } else {
-            // Retorna uma URL de imagem padrão caso o usuário não tenha uma imagem
-            const defaultImageURL = '/uploads/default-profile.png';
-            return res.json({ imageUrl: defaultImageURL });
+            return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
         }
     });
 });
