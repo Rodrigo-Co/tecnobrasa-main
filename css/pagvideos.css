@@ -188,6 +188,7 @@
   }
   
   #videoPlayerSection {
+    margin-top: 10px !important;
     display: none; /* Mantido como hidden até que o vídeo seja aberto */
     flex: 3;
   }
