@@ -391,8 +391,10 @@ app.post('/verificarCadastro', (req, res) => {
 app.post('/salvarProgresso', (req, res) => {
     const { usuarioId, cursoId, videosAssistidos, totalVideos } = req.body;
 
-    // Calcular a porcentagem de progresso
-    const progresso = (videosAssistidos / totalVideos) * 100;
+    // Limitar videosAssistidos ao totalVideos para evitar que ultrapasse
+    const videosAssistidosValidados = Math.min(videosAssistidos, totalVideos);
+    // Calcular a porcentagem de progresso, garantindo que nunca ultrapasse 100%
+    const progresso = Math.min((videosAssistidosValidados / totalVideos) * 100, 100);
 
     // Verificar se o progresso do usuário e curso já existe
     const queryCheck = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
@@ -405,7 +407,7 @@ app.post('/salvarProgresso', (req, res) => {
         if (results.length > 0) {
             // Atualizar progresso existente
             const queryUpdate = 'UPDATE progresso_usuario SET videosAssistidos = ?, progresso = ? WHERE usuarioId = ? AND cursoId = ?';
-            db.query(queryUpdate, [videosAssistidos, progresso, usuarioId, cursoId], (err, result) => {
+            db.query(queryUpdate, [videosAssistidosValidados, progresso, usuarioId, cursoId], (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ message: 'Erro ao atualizar progresso.' });
@@ -415,7 +417,7 @@ app.post('/salvarProgresso', (req, res) => {
         } else {
             // Inserir novo progresso
             const queryInsert = 'INSERT INTO progresso_usuario (usuarioId, cursoId, videosAssistidos, progresso) VALUES (?, ?, ?, ?)';
-            db.query(queryInsert, [usuarioId, cursoId, videosAssistidos, progresso], (err, result) => {
+            db.query(queryInsert, [usuarioId, cursoId, videosAssistidosValidados, progresso], (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ message: 'Erro ao salvar progresso.' });
@@ -444,8 +446,8 @@ app.get('/getProgresso', (req, res) => {
         if (results.length > 0) {
             const progresso = results[0];
             res.json({
-                videosAssistidos: progresso.videosAssistidos,
-                progresso: progresso.progresso
+                videosAssistidos: Math.min(progresso.videosAssistidos, 3), // Exemplo com 3 vídeos como limite
+                progresso: Math.min(progresso.progresso, 100) // Limitar progresso a 100%
             });
         } else {
             return res.json({ videosAssistidos: 0, progresso: 0 });

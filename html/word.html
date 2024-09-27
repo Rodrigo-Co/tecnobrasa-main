@@ -103,7 +103,7 @@
       </div>
 
       <!-- Vídeo e Área de Notas -->
-      <div id="videoPlayerSection" style="flex: 2; margin-left: 10px; margin-top: -75px;">
+      <div id="videoPlayerSection" style="flex: 2; margin-left: 10px; margin-top: -65px;">
         <button onclick="closeVideo()">Fechar</button>
         <div style="display: flex; flex-direction: column; align-items: flex-start;">
           <video id="videoPlayer" width="800" height="600" controls>
@@ -199,11 +199,13 @@ function obterUsuarioId() {
 document.getElementById('videoPlayer').addEventListener('ended', function() {
     // Incrementar o número de vídeos assistidos
     let videosAssistidos = parseInt(localStorage.getItem('videosAssistidos')) || 0;
-    videosAssistidos += 1;
-    localStorage.setItem('videosAssistidos', videosAssistidos);
-
     // Total de vídeos no curso (pode ser dinâmico)
     const totalVideos = 3; // Exemplo com 3 vídeos
+    if (videosAssistidos < totalVideos) {
+        videosAssistidos += 1;
+    }
+    localStorage.setItem('videosAssistidos', videosAssistidos);
+
 
     // Chamar a função para salvar o progresso
     salvarProgresso(videosAssistidos, totalVideos);
@@ -231,7 +233,7 @@ function salvarProgresso(videosAssistidos, totalVideos) {
         data: JSON.stringify(data),
         success: function(response) {
             alert(response.message); // Exibe uma mensagem de sucesso
-            atualizarBarraProgresso((videosAssistidos / totalVideos) * 100); // Atualiza a barra de progresso
+            atualizarBarraProgresso(Math.min((videosAssistidos / totalVideos) * 100, 100)); // Atualiza a barra de progresso
         },
         error: function(xhr, status, error) {
             console.error('Erro ao salvar progresso:', error);
@@ -240,6 +242,7 @@ function salvarProgresso(videosAssistidos, totalVideos) {
 }
 function atualizarBarraProgresso(progresso) {
   const progressBar = document.getElementById('progress-bar'); // Usa o ID em vez da classe
+  const progressoLimitado = Math.min(progresso, 100); // Limita o progresso a 100%
   progressBar.style.width = `${progresso}%`; // Define a largura em porcentagem
   progressBar.innerText = `${progresso.toFixed(0)}%`; // Atualiza o texto da barra
 }
@@ -254,7 +257,7 @@ $(document).ready(function() {
             method: 'GET',
             data: { usuarioId: usuarioId, cursoId: 1 },
             success: function(response) {
-                const progresso = (response.videosAssistidos / 3) * 100; // Exemplo com 3 vídeos
+                const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
                 atualizarBarraProgresso(progresso); // Atualiza a barra de progresso
             },
             error: function(xhr, status, error) {
