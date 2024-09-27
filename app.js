@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -307,7 +307,7 @@ app.get('/getUsuarioId', (req, res) => {
 // Rota para login de dados com verificação da senha criptografada
 app.post('/login', (req, res) => {
     const { email, senha } = req.body;
-
+    
     // Verificar se o e-mail existe
     const queryVerificar = 'SELECT * FROM usuario WHERE email = ?';
     db.query(queryVerificar, [email], (err, results) => {
@@ -448,11 +448,60 @@ app.get('/getProgresso', (req, res) => {
                 progresso: progresso.progresso
             });
         } else {
-            res.json({ videosAssistidos: 0, progresso: 0 });
+            return res.json({ videosAssistidos: 0, progresso: 0 });
+        }
+    });
+});
+// POST: Adicionar ou remover curso dos favoritos (usando callbacks)
+app.post('/user/favorite', (req, res) => {
+    const userId = req.session.usuario.idusuario; // ID do usuário logado
+    const courseId = req.body.courseId;
+
+    // Verifique se o curso já está favoritado
+    db.query('SELECT * FROM favorites WHERE usuario_id = ? AND curso_id = ?', [userId, courseId], (err, isFavorited) => {
+        if (err) {
+            console.error('Erro ao verificar favorito:', err);
+            return res.status(500).json({ success: false, message: 'Erro no servidor ao verificar favoritos.' });
+        }
+
+        if (isFavorited.length > 0) {
+            // Se já estiver favoritado, remova-o
+            db.query('DELETE FROM favorites WHERE usuario_id = ? AND curso_id = ?', [userId, courseId], (err) => {
+                if (err) {
+                    console.error('Erro ao remover favorito:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao remover favorito.' });
+                }
+                res.json({ success: true, isFavorited: false });
+            });
+        } else {
+            // Caso contrário, adicione-o aos favoritos
+            db.query('INSERT INTO favorites (usuario_id, curso_id) VALUES (?, ?)', [userId, courseId], (err) => {
+                if (err) {
+                    console.error('Erro ao adicionar favorito:', err);
+                    return res.status(500).json({ success: false, message: 'Erro ao adicionar favorito.' });
+                }
+                res.json({ success: true, isFavorited: true });
+            });
         }
     });
 });
 
+// GET: Carregar os favoritos do usuário (usando callbacks)
+app.get('/user/favorites', (req, res) => {
+    const userId = req.session.usuario.idusuario; // ID do usuário logado
+
+    db.query('SELECT curso_id FROM favorites WHERE usuario_id = ?', [userId], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar favoritos:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao carregar favoritos.' });
+        }   
+        // Adicione este log para verificar a resposta do banco
+        console.log('Favoritos retornados:', results);
+
+        const favorites = results.map(row => row.curso_id);
+        res.json({ success: true, favorites });
+    });
+});
 // verificar login
 app.get('/verificarLogin', (req, res) => {
     if (req.session.usuario) {

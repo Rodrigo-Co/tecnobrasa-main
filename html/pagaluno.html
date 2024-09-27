@@ -58,7 +58,7 @@
 
         <div id="Container" class="container">
 
-            <a class="mix word office" href="/word.html">
+            <a class="mix word office" href="/word.html" data-id="word">
                 <img class="image" src="/microsoft-word.png">
                 <div class="overlay">
                     <div class="hover-text">
@@ -68,7 +68,7 @@
                 <button class="favorite-button" onclick="toggleFavorite(event, this, 'word')">⭐ Favoritar</button>
             </a>
 
-            <a class="mix excel office" href="/excel.html">
+            <a class="mix excel office" href="/excel.html" data-id="excel">
                 <img class="image" src="/microsoft-excel.png">
                 <div class="overlay">
                     <div class="hover-text">
@@ -78,7 +78,7 @@
                 <button class="favorite-button" onclick="toggleFavorite(event, this, 'excel')">⭐ Favoritar</button>
             </a>
 
-            <a class="mix powerpoint office" href="/ppt.html">
+            <a class="mix powerpoint office" href="/ppt.html" data-id="powerpoint">
                 <img class="image" src="/microsoft-power-point.png">
                 <div class="overlay">
                     <div class="hover-text">
@@ -88,7 +88,7 @@
                 <button class="favorite-button" onclick="toggleFavorite(event, this, 'powerpoint')">⭐ Favoritar</button>
             </a>
 
-            <a class="mix computadores hardware" href="/computador.html">
+            <a class="mix computadores hardware" href="/computador.html" data-id="computador">
                 <img class="image" src="/computer-repair.png">
                 <div class="overlay">
                     <div class="hover-text">
@@ -142,22 +142,29 @@ function toggleFavorite(event, button, courseId) {
     event.preventDefault();  // Impede o redirecionamento do link
     event.stopPropagation(); // Impede o clique no botão de ativar o link pai
 
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-    // Verifica se o curso já está favoritado
-    if (favorites.includes(courseId)) {
-        favorites = favorites.filter(id => id !== courseId); // Remove dos favoritos
-        $(button).closest('.mix').removeClass('favorite');   // Remove a classe .favorite
-    } else {
-        favorites.push(courseId); // Adiciona aos favoritos
-        $(button).closest('.mix').addClass('favorite');      // Adiciona a classe .favorite
-    }
-
-    // Armazena a lista de favoritos no localStorage
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-
-    // Atualiza o estado visual do botão (opcional)
-    updateFavoriteButton(button, favorites.includes(courseId));
+    // Faz uma requisição AJAX para o servidor
+    $.ajax({
+        url: '/user/favorite', // URL para a rota no backend
+        method: 'POST',
+        data: { courseId: courseId }, // Enviamos o ID do curso
+        success: function(response) {
+            if (response.success) {
+                // Se o curso foi favoritado com sucesso, atualiza a interface
+                if (response.isFavorited) {
+                    $(button).closest('.mix').addClass('favorite');
+                    updateFavoriteButton(button, true);
+                } else {
+                    $(button).closest('.mix').removeClass('favorite');
+                    updateFavoriteButton(button, false);
+                }
+            } else {
+                console.error('Erro ao favoritar o curso:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro na requisição:', error);
+        }
+    });
 }
 
 // Atualiza o estado visual do botão
@@ -170,16 +177,30 @@ function updateFavoriteButton(button, isFavorited) {
 }
 // Carregar favoritos ao iniciar a página
 $(document).ready(function () {
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    // Faz uma requisição AJAX para carregar os favoritos do banco de dados
+    $.ajax({
+        url: '/user/favorites', // URL para a rota que retorna os favoritos do usuário
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                let favorites = response.favorites; // Lista de favoritos retornada pelo backend
 
-    // Marca visualmente os itens favoritados
-    favorites.forEach(courseId => {
-        $(`[data-id="${courseId}"]`).addClass('favorite'); // Adiciona a classe .favorite aos itens já favoritados
-        $(`[data-id="${courseId}"] .favorite-button`).text('⭐ Desfavoritar'); // Atualiza o texto do botão
+                // Marca visualmente os itens favoritados
+                favorites.forEach(courseId => {
+                    $(`[data-id="${courseId}"]`).addClass('favorite'); // Adiciona a classe .favorite aos itens já favoritados
+                    $(`[data-id="${courseId}"] .favorite-button`).text('⭐ Desfavoritar'); // Atualiza o texto do botão
+                });
+
+                // Atualiza o filtro de favoritos
+                $('#Container').mixItUp(); // Se você estiver usando MixItUp para filtragem
+            } else {
+                console.error('Erro ao carregar favoritos:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro na requisição:', error);
+        }
     });
-
-    // Atualiza o filtro de favoritos
-    $('#Container').mixItUp(); // Se você estiver usando MixItUp para filtragem
 });
     </script>
 </body>
