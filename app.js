@@ -388,15 +388,17 @@ app.post('/verificarCadastro', (req, res) => {
     });
 });
 
+// Rota para salvar o progresso no banco de dados
 app.post('/salvarProgresso', (req, res) => {
     const { usuarioId, cursoId, videosAssistidos, totalVideos } = req.body;
 
-    // Limitar videosAssistidos ao totalVideos para evitar que ultrapasse
+    // Validar para que 'videosAssistidos' não exceda 'totalVideos'
     const videosAssistidosValidados = Math.min(videosAssistidos, totalVideos);
-    // Calcular a porcentagem de progresso, garantindo que nunca ultrapasse 100%
+
+    // Calcular a porcentagem de progresso, limitando a 100%
     const progresso = Math.min((videosAssistidosValidados / totalVideos) * 100, 100);
 
-    // Verificar se o progresso do usuário e curso já existe
+    // Verificar se o progresso do usuário para o curso já existe
     const queryCheck = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
     db.query(queryCheck, [usuarioId, cursoId], (err, results) => {
         if (err) {
@@ -405,37 +407,39 @@ app.post('/salvarProgresso', (req, res) => {
         }
 
         if (results.length > 0) {
-            // Atualizar progresso existente
+            // Atualizar o progresso existente
             const queryUpdate = 'UPDATE progresso_usuario SET videosAssistidos = ?, progresso = ? WHERE usuarioId = ? AND cursoId = ?';
             db.query(queryUpdate, [videosAssistidosValidados, progresso, usuarioId, cursoId], (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ message: 'Erro ao atualizar progresso.' });
                 }
-                res.json({ message: 'Progresso atualizado com sucesso!' });
+                res.json({ message: 'Progresso atualizado com sucesso!', progresso });
             });
         } else {
-            // Inserir novo progresso
+            // Inserir um novo registro de progresso
             const queryInsert = 'INSERT INTO progresso_usuario (usuarioId, cursoId, videosAssistidos, progresso) VALUES (?, ?, ?, ?)';
             db.query(queryInsert, [usuarioId, cursoId, videosAssistidosValidados, progresso], (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({ message: 'Erro ao salvar progresso.' });
                 }
-                res.json({ message: 'Progresso salvo com sucesso!' });
+                res.json({ message: 'Progresso salvo com sucesso!', progresso });
             });
         }
     });
 });
 
+// Rota para obter o progresso do usuário
 app.get('/getProgresso', (req, res) => {
-    const usuarioId = req.query.usuarioId;
-    const cursoId = req.query.cursoId;
+    const { usuarioId, cursoId } = req.query;
 
+    // Verificar se os parâmetros foram fornecidos
     if (!usuarioId || !cursoId) {
         return res.status(400).json({ message: 'ID do usuário ou do curso não fornecido.' });
     }
 
+    // Consulta para buscar o progresso do banco de dados
     const query = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
     db.query(query, [usuarioId, cursoId], (err, results) => {
         if (err) {
@@ -446,11 +450,12 @@ app.get('/getProgresso', (req, res) => {
         if (results.length > 0) {
             const progresso = results[0];
             res.json({
-                videosAssistidos: Math.min(progresso.videosAssistidos, 3), // Exemplo com 3 vídeos como limite
-                progresso: Math.min(progresso.progresso, 100) // Limitar progresso a 100%
+                videosAssistidos: progresso.videosAssistidos, // Quantidade de vídeos assistidos
+                progresso: Math.min(progresso.progresso, 100) // Limitar a 100%
             });
         } else {
-            return res.json({ videosAssistidos: 0, progresso: 0 });
+            // Se não houver progresso salvo, retornar valores zerados
+            res.json({ videosAssistidos: 0, progresso: 0 });
         }
     });
 });

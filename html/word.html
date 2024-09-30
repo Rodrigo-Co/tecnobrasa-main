@@ -54,7 +54,7 @@
       <!-- Lista de vídeos -->
       <div id="Container" class="container-fluid" style="flex: 1;">
         <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-action" aria-current="true" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'Word Office Básico')">
+          <a href="#" class="list-group-item list-group-item-action" aria-current="true" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'Word Office Básico', 'video1')">
             <div class="d-flex align-items-center">
               <div id="icon" style="margin-right: 15px;">
                 <img src="/caioicon.jpg" alt="Word Básico" style="width: 70px; height: 70px; border-radius: 50%;">
@@ -69,7 +69,7 @@
               </div>
             </div>
           </a>
-          <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/kbJRDVxArUc', 'Word Office Intermediário')">
+          <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/kbJRDVxArUc', 'Word Office Intermediário', 'video2')">
             <div class="d-flex align-items-center">
               <div id="icon" style="margin-right: 15px;">
                 <img src="/caioicon.jpg" alt="Word Intermediário" style="width: 70px; height: 70px; border-radius: 50%;">
@@ -84,7 +84,7 @@
               </div>
             </div>
           </a>
-          <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/l1FY4o_Ijm8', 'Word Office Avançado')">
+          <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/l1FY4o_Ijm8', 'Word Office Avançado', 'video3')">
             <div class="d-flex align-items-center">
               <div id="icon" style="margin-right: 15px;">
                 <img src="/caioicon.jpg" alt="Word Avançado" style="width: 70px; height: 70px; border-radius: 50%;">
@@ -123,9 +123,10 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     let youtubePlayer; // Variável global para o player do YouTube
+let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
 
-// Função para abrir o vídeo
-function openVideo(videoSrc, title) {
+// Função para abrir o vídeo e contar progresso ao clicar
+function openVideo(videoSrc, title, videoIdAtual) {
   // Atualizar o título do vídeo
   document.getElementById('videoTitle').innerText = title;
 
@@ -141,8 +142,10 @@ function openVideo(videoSrc, title) {
 
   // Mostrar a seção de vídeo
   const videoSection = document.getElementById('videoPlayerSection');
-  videoSection.classList.remove('d-none');
   videoSection.style.display = 'flex';
+
+  // Chamar função para contar progresso ao clicar no item
+  contarProgresso(videoIdAtual);
 }
 
 // Função para carregar o player do YouTube
@@ -153,28 +156,19 @@ function loadYouTubePlayer(videoId) {
       height: '600',
       width: '800',
       videoId: videoId,
-      events: {
-        'onStateChange': onPlayerStateChange
-      }
     });
   } else {
     // Se o player já existe, carregue um novo vídeo
     youtubePlayer.loadVideoById(videoId);
+    youtubePlayer.seekTo(0);
   }
 }
 
-// Verifica se o vídeo do YouTube terminou
+// Verifica o estado do vídeo do YouTube
 function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.ENDED) {
-    const videoIdAtual = youtubePlayer.getVideoUrl();
-
-    let videosAssistidosIds = JSON.parse(localStorage.getItem('videosAssistidosIds')) || [];
-
-    if (!videosAssistidosIds.includes(videoIdAtual)) {
-      videosAssistidosIds.push(videoIdAtual);
-      localStorage.setItem('videosAssistidosIds', JSON.stringify(videosAssistidosIds));
-      salvarProgresso(videosAssistidosIds.length, 3);
-    }
+  if (event.data === YT.PlayerState.PLAYING) {
+    const videoIdAtual = youtubePlayer.getVideoData().video_id; // Pegar o ID correto do vídeo
+    contarProgresso(videoIdAtual);
   }
 }
 
@@ -231,88 +225,109 @@ function obterUsuarioId() {
         }
     });
 }
-    // Ouvir quando o vídeo terminar
-    document.getElementById('videoPlayer').addEventListener('ended', function() {
-    const videoIdAtual = document.getElementById('videoPlayer').getAttribute('src'); // Obter o ID do vídeo atual (ou a URL, se usar isso como identificador)
+// Função para contar progresso sem duplicar
+function contarProgresso(videoIdAtual) {
+  // Verificar se o vídeo já foi assistido
+  if (videosJaAssistidos.includes(videoIdAtual)) {
+    console.log('O vídeo já foi assistido. Progresso não será contado novamente.');
+    return; // Não contar o progresso novamente
+  }
 
-    // Obtenha a lista de vídeos assistidos do localStorage (ou crie uma nova lista vazia)
-    let videosAssistidosIds = JSON.parse(localStorage.getItem('videosAssistidosIds')) || [];
+  // Variável que conterá o número de vídeos assistidos
+  let videosAssistidos = 0;
 
-    // Verifique se o vídeo atual já foi assistido
-    if (!videosAssistidosIds.includes(videoIdAtual)) {
-        // Se não foi assistido ainda, adicione o ID à lista
-        videosAssistidosIds.push(videoIdAtual);
+  // Busca o progresso atual no banco de dados
+  $.ajax({
+    url: '/getProgresso',
+    method: 'GET',
+    data: { usuarioId: usuarioId, cursoId: 1 },
+    success: function(response) {
+      videosAssistidos = response.videosAssistidos || 0;
 
-        // Atualize o localStorage com a lista de vídeos assistidos
-        localStorage.setItem('videosAssistidosIds', JSON.stringify(videosAssistidosIds));
+      // Verifica se o vídeo atual não foi contabilizado (baseado no número de vídeos assistidos)
+      if (videosAssistidos < 3) {
+        // Incrementa o número de vídeos assistidos
+        videosAssistidos++;
 
-        // Atualize o progresso normalmente
-        let videosAssistidos = videosAssistidosIds.length; // Agora é o tamanho da lista de IDs
-        const totalVideos = 3; // Exemplo com 3 vídeos
+        // Adicionar o vídeo à lista de vídeos já assistidos
+        videosJaAssistidos.push(videoIdAtual);
 
-        // Chame a função para salvar o progresso
-        salvarProgresso(videosAssistidos, totalVideos);
-    } else {
-        console.log('Este vídeo já foi assistido. Progresso não será incrementado.');
+        // Salva o progresso atualizado
+        salvarProgresso(videosAssistidos, 3);
+      } else {
+        console.log('Todos os vídeos já foram assistidos.');
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('Erro ao buscar progresso:', error);
     }
-});
+  });
+}
+
+// Função para salvar o progresso no banco de dados
 function salvarProgresso(videosAssistidos, totalVideos) {
   if (!usuarioId) {
-        console.error('ID do usuário não foi obtido ainda!');
-        return;
+    console.error('ID do usuário não foi obtido ainda!');
+    return;
+  }
+
+  const cursoId = 1; // ID do curso
+
+  const data = {
+    usuarioId: usuarioId,
+    cursoId: cursoId,
+    videosAssistidos: videosAssistidos,
+    totalVideos: totalVideos
+  };
+
+  // Envia o progresso para o backend
+  $.ajax({
+    url: '/salvarProgresso',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: function(response) {
+      console.log('Progresso salvo com sucesso!', response);
+
+      const progresso = Math.min((videosAssistidos / totalVideos) * 100, 100);
+
+      // Atualiza a barra de progresso visualmente
+      atualizarBarraProgresso(progresso);
+    },
+    error: function(xhr, status, error) {
+      console.error('Erro ao salvar progresso:', error);
     }
-
-    const cursoId = 1; // O ID do curso (também pode ser dinâmico)
-
-    const data = {
-        usuarioId: usuarioId,
-        cursoId: cursoId,
-        videosAssistidos: videosAssistidos,
-        totalVideos: totalVideos
-    };
-
-    // Fazer a requisição POST para salvar o progresso
-    $.ajax({
-        url: '/salvarProgresso',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function(response) {
-            //alert(response.message); // Exibe uma mensagem de sucesso
-            atualizarBarraProgresso(Math.min((videosAssistidos / totalVideos) * 100, 100)); // Atualiza a barra de progresso
-        },
-        error: function(xhr, status, error) {
-            console.error('Erro ao salvar progresso:', error);
-        }
-    });
+  });
 }
+
+// Função para atualizar a barra de progresso
 function atualizarBarraProgresso(progresso) {
-  const progressBar = document.getElementById('progress-bar'); // Usa o ID em vez da classe
+  const progressBar = document.getElementById('progress-bar');
   const progressoLimitado = Math.min(progresso, 100); // Limita o progresso a 100%
-  progressBar.style.width = `${progresso}%`; // Define a largura em porcentagem
-  progressBar.innerText = `${progresso.toFixed(0)}%`; // Atualiza o texto da barra
+  progressBar.style.width = `${progressoLimitado}%`; // Define a largura em porcentagem
+  progressBar.innerText = `${progressoLimitado.toFixed(0)}%`; // Atualiza o texto da barra
+  console.log('Barra de progresso atualizada para:', progressoLimitado + '%');
 }
 
 // Chamar a função de obtenção do ID do usuário assim que a página carregar
 $(document).ready(function() {
-    // Primeiro obtenha o ID do usuário
-    obterUsuarioId().then(function() {
-        // Fazer requisição para buscar o progresso do curso
-        $.ajax({
-            url: '/getProgresso',
-            method: 'GET',
-            data: { usuarioId: usuarioId, cursoId: 1 },
-            success: function(response) {
-                const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
-                atualizarBarraProgresso(progresso); // Atualiza a barra de progresso
-            },
-            error: function(xhr, status, error) {
-                console.error('Erro ao buscar progresso:', error);
-            }
-        });
+  obterUsuarioId().then(function() {
+    // Fazer requisição para buscar o progresso do curso
+    $.ajax({
+      url: '/getProgresso',
+      method: 'GET',
+      data: { usuarioId: usuarioId, cursoId: 1 },
+      success: function(response) {
+        const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
+        console.log('Progresso recuperado:', progresso); // Verificar o progresso recuperado
+        atualizarBarraProgresso(progresso); // Atualiza a barra de progresso
+      },
+      error: function(xhr, status, error) {
+        console.error('Erro ao buscar progresso:', error);
+      }
     });
+  });
 });
-
   </script>
 </body>
 
