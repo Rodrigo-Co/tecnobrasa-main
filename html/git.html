@@ -52,48 +52,48 @@
   <!-- Lista de vídeos -->
     <div id="Container" class="container-fluid" style="flex: 1;">
       <div class="list-group">
-        <a href="#" class="list-group-item list-group-item-action" aria-current="true" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'Conhecendo Hardware', 'video1')">
+        <a href="#" class="list-group-item list-group-item-action" aria-current="true" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'GIT1', 'video1')">
           <div class="d-flex align-items-center">
             <div id="icon" style="margin-right: 15px;">
-              <img src="#" alt="Conhecendo Hardware" style="width: 70px; height: 70px; border-radius: 50%;">
+              <img src="#" alt="GIT1" style="width: 70px; height: 70px; border-radius: 50%;">
             </div>
             <div class="w-100">
               <div class="d-flex justify-content-between">
-                <h5 class="mb-1">Conhecendo Hardware</h5>
+                <h5 class="mb-1">GIT1</h5>
                 <small>10 minutos</small>
               </div>
               <p class="mb-1">Aula voltada para iniciantes.</p>
-              <small style="position: relative; right: 0;">Rodrigo Logrado</small>
+              <small style="position: relative; right: 0;">Caio Ribeiro</small>
             </div>
           </div>
         </a>
-        <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'EletroEletrônica', 'video2')">
+        <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'GIT2', 'video2')">
           <div class="d-flex align-items-center">
             <div id="icon" style="margin-right: 15px;">
-              <img src="#" alt="EletroEletrônica" style="width: 70px; height: 70px; border-radius: 50%;">
+              <img src="#" alt="GIT2" style="width: 70px; height: 70px; border-radius: 50%;">
             </div>
             <div class="w-100">
               <div class="d-flex justify-content-between">
-                <h5 class="mb-1">EletroEletrônica</h5>
+                <h5 class="mb-1">GIT2</h5>
                 <small>20 minutos</small>
               </div>
-              <p class="mb-1">Aula voltada para introdução básica em eletroeletrônica.</p>
-              <small style="position: relative; right: 0;">Rodrigo Logrado</small>
+              <p class="mb-1">Aula voltada para introdução GIT.</p>
+              <small style="position: relative; right: 0;">Caio Ribeiro</small>
             </div>
           </div>
         </a>
-        <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'Computadores na prática', 'video3')">
+        <a href="#" class="list-group-item list-group-item-action" onclick="openVideo('https://www.youtube.com/embed/88MRrNI0u_4', 'GIT3', 'video3')">
           <div class="d-flex align-items-center">
             <div id="icon" style="margin-right: 15px;">
-              <img src="#" alt="Computadores na prática" style="width: 70px; height: 70px; border-radius: 50%;">
+              <img src="#" alt="GIT3" style="width: 70px; height: 70px; border-radius: 50%;">
             </div>
             <div class="w-100">
               <div class="d-flex justify-content-between">
-                <h5 class="mb-1">Computadores na prática</h5>
+                <h5 class="mb-1">GIT3</h5>
                 <small>30 minutos</small>
               </div>
-              <p class="mb-1">Aula voltada para prática de manuseio de computadores.</p>
-              <small style="position: relative; right: 0;">Rodrigo Logrado</small>
+              <p class="mb-1">Aula voltada para prática de GIT.</p>
+              <small style="position: relative; right: 0;">Caio Ribeiro</small>
             </div>
           </div>
         </a>
@@ -239,12 +239,12 @@ function contarProgresso(videoIdAtual) {
   $.ajax({
     url: '/getProgresso',
     method: 'GET',
-    data: { usuarioId: usuarioId, cursoId: 4 },
+    data: { usuarioId: usuarioId, cursoId: 5 },
     success: function(response) {
       videosAssistidos = response.videosAssistidos || 0;
 
       // Verifica se o vídeo atual não foi contabilizado (baseado no número de vídeos assistidos)
-      if (videosAssistidos < 3) {
+      if (videosAssistidos < 3) { 
         // Incrementa o número de vídeos assistidos
         videosAssistidos++;
 
@@ -270,7 +270,7 @@ function salvarProgresso(videosAssistidos, totalVideos) {
     return;
   }
 
-  const cursoId = 4; // ID do curso
+  const cursoId = 5; // ID do curso
 
   const data = {
     usuarioId: usuarioId,
@@ -315,7 +315,7 @@ $(document).ready(function() {
     $.ajax({
       url: '/getProgresso',
       method: 'GET',
-      data: { usuarioId: usuarioId, cursoId: 4 },
+      data: { usuarioId: usuarioId, cursoId: 5 },
       success: function(response) {
         const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
         console.log('Progresso recuperado:', progresso); // Verificar o progresso recuperado

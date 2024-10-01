@@ -91,7 +91,14 @@ button+label {
   margin-bottom: 0%;
   display: none;
 }
-
+.mix.git {
+  width: 100%;
+}
+.mix.git img{
+  width: 70%;
+  position: relative;
+  left: 14%;
+}
 .container .mix:after {
   content: attr(data-myorder);
   color: white;
