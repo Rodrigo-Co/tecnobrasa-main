@@ -193,6 +193,32 @@
     flex: 3;
   }
   
+  #videoPlayerSection button{
+    margin-right: 50px;
+    color: #000;
+  }
+
   #videoPlayerSection.active {
     display: block;
   }
+  
+  .star-rating {
+    
+    font-size: 30px;
+    direction: rtl;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .star {
+    cursor: pointer;
+    color: #d3d3d3;
+    margin-right: 5px;
+  }
+  .star:hover,
+  .star:hover ~ .star {
+    color: gold;
+  }
+  .star.selected {
+    color: gold;
+  }
+  

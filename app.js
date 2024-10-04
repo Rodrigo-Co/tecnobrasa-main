@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const fs = require('fs');
+const fs = require('fs'); 
 
 const app = express();
 const port = 3300;
@@ -390,43 +390,70 @@ app.post('/verificarCadastro', (req, res) => {
 
 // Rota para salvar o progresso no banco de dados
 app.post('/salvarProgresso', (req, res) => {
-    const { usuarioId, cursoId, videosAssistidos, totalVideos } = req.body;
+    const { usuarioId, cursoId, videoIdAtual, totalVideos } = req.body;
 
-    // Validar para que 'videosAssistidos' não exceda 'totalVideos'
-    const videosAssistidosValidados = Math.min(videosAssistidos, totalVideos);
-
-    // Calcular a porcentagem de progresso, limitando a 100%
-    const progresso = Math.min((videosAssistidosValidados / totalVideos) * 100, 100);
-
-    // Verificar se o progresso do usuário para o curso já existe
+    // Validar para que o número de vídeos assistidos não exceda o total de vídeos
     const queryCheck = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
+    
     db.query(queryCheck, [usuarioId, cursoId], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Erro ao verificar progresso.' });
         }
 
-        if (results.length > 0) {
-            // Atualizar o progresso existente
-            const queryUpdate = 'UPDATE progresso_usuario SET videosAssistidos = ?, progresso = ? WHERE usuarioId = ? AND cursoId = ?';
-            db.query(queryUpdate, [videosAssistidosValidados, progresso, usuarioId, cursoId], (err, result) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ message: 'Erro ao atualizar progresso.' });
-                }
-                res.json({ message: 'Progresso atualizado com sucesso!', progresso });
-            });
-        } else {
-            // Inserir um novo registro de progresso
-            const queryInsert = 'INSERT INTO progresso_usuario (usuarioId, cursoId, videosAssistidos, progresso) VALUES (?, ?, ?, ?)';
-            db.query(queryInsert, [usuarioId, cursoId, videosAssistidosValidados, progresso], (err, result) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ message: 'Erro ao salvar progresso.' });
-                }
-                res.json({ message: 'Progresso salvo com sucesso!', progresso });
-            });
-        }
+        let videosAssistidos = results.length > 0 ? results[0].videosAssistidos : 0;
+
+        // Verificar se o vídeo atual já foi assistido
+        const queryCheckVideo = 'SELECT * FROM videos_assistidos WHERE usuarioId = ? AND cursoId = ? AND videoId = ?';
+        db.query(queryCheckVideo, [usuarioId, cursoId, videoIdAtual], (err, videoResults) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Erro ao verificar se o vídeo foi assistido.' });
+            }
+
+            if (videoResults.length > 0) {
+                // O vídeo já foi assistido
+                console.log('Vídeo já assistido. Progresso não será atualizado.');
+                return res.json({ message: 'Vídeo já assistido. Progresso não atualizado.', progresso: results[0].progresso });
+            } else {
+                // Adicionar o vídeo à tabela de vídeos assistidos
+                const queryInsertVideo = 'INSERT INTO videos_assistidos (usuarioId, cursoId, videoId) VALUES (?, ?, ?)';
+                db.query(queryInsertVideo, [usuarioId, cursoId, videoIdAtual], (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Erro ao registrar vídeo assistido.' });
+                    }
+
+                    // Atualizar o número de vídeos assistidos
+                    videosAssistidos += 1;
+
+                    // Calcular a porcentagem de progresso
+                    const progresso = Math.min((videosAssistidos / totalVideos) * 100, 100);
+
+                    if (results.length > 0) {
+                        // Atualizar o progresso existente
+                        const queryUpdate = 'UPDATE progresso_usuario SET videosAssistidos = ?, progresso = ? WHERE usuarioId = ? AND cursoId = ?';
+                        db.query(queryUpdate, [videosAssistidos, progresso, usuarioId, cursoId], (err, result) => {
+                            if (err) {
+                                console.error(err);
+                                return res.status(500).json({ message: 'Erro ao atualizar progresso.' });
+                            }
+                            res.json({ message: 'Progresso atualizado com sucesso!', progresso });
+                        });
+                    } else {
+                        // Inserir um novo registro de progresso
+                        const queryInsert = 'INSERT INTO progresso_usuario (usuarioId, cursoId, videosAssistidos, progresso) VALUES (?, ?, ?, ?)';
+                        db.query(queryInsert, [usuarioId, cursoId, videosAssistidos, progresso], (err, result) => {
+                            if (err) {
+                                console.error(err);
+                                return res.status(500).json({ message: 'Erro ao salvar progresso.' });
+                            }
+                            res.json({ message: 'Progresso salvo com sucesso!', progresso });
+                        });
+                    }
+                });
+            }
+        });
     });
 });
 
@@ -440,7 +467,13 @@ app.get('/getProgresso', (req, res) => {
     }
 
     // Consulta para buscar o progresso do banco de dados
-    const query = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
+    const query = `
+        SELECT pu.videosAssistidos, pu.progresso, COUNT(va.videoId) AS videosAssistidos
+        FROM progresso_usuario pu
+        LEFT JOIN videos_assistidos va ON va.usuarioId = pu.usuarioId AND va.cursoId = pu.cursoId
+        WHERE pu.usuarioId = ? AND pu.cursoId = ?
+        GROUP BY pu.videosAssistidos, pu.progresso
+    `;
     db.query(query, [usuarioId, cursoId], (err, results) => {
         if (err) {
             console.error(err);
@@ -450,7 +483,7 @@ app.get('/getProgresso', (req, res) => {
         if (results.length > 0) {
             const progresso = results[0];
             res.json({
-                videosAssistidos: progresso.videosAssistidos, // Quantidade de vídeos assistidos
+                videosAssistidos: progresso.videosAssistidos || 0, // Quantidade de vídeos assistidos
                 progresso: Math.min(progresso.progresso, 100) // Limitar a 100%
             });
         } else {
@@ -509,6 +542,38 @@ app.get('/user/favorites', (req, res) => {
         res.json({ success: true, favorites });
     });
 });
+
+app.post('/salvarAvaliacao', (req, res) => {
+    const { usuarioId, cursoId, avaliacao } = req.body;
+
+    // Executa a query
+    db.query('INSERT INTO avaliacoes (usuarioId, cursoId, avaliacao) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE avaliacao = ?', [usuarioId, cursoId, avaliacao, avaliacao], (err, results) => {
+        if (err) {
+            console.error('Erro ao salvar avaliação:', err);
+            res.status(500).json({ success: false, message: 'Erro ao salvar avaliação.' });
+        } else {
+            res.status(200).json({ success: true, message: 'Avaliação salva com sucesso!' });
+        }
+    });
+
+});
+
+app.get('/getAvaliacao', (req, res) => {
+    const { usuarioId, cursoId } = req.query;
+
+    db.query('SELECT avaliacao FROM avaliacoes WHERE usuarioId = ? AND cursoId = ?', [usuarioId, cursoId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar avaliação:', err);
+            res.status(500).json({ success: false, message: 'Erro ao buscar avaliação.' });
+        } else if (results.length > 0) {
+            res.status(200).json({ success: true, avaliacao: results[0].avaliacao });
+        } else {
+            res.status(404).json({ success: false, message: 'Avaliação não encontrada.' });
+        }
+    });
+
+});
+
 // verificar login
 app.get('/verificarLogin', (req, res) => {
     if (req.session.usuario) {

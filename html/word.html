@@ -102,17 +102,34 @@
         </div>
       </div>
 
-      <!-- Vídeo e Área de Notas -->
-      <div id="videoPlayerSection" style="flex: 2; margin-left: 10px; margin-top: -65px;">
-        <button onclick="closeVideo()">Fechar</button>
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-          <div id="videoPlayer" style="width: 800px; height: 600px;" ></div>
-          <div style="margin-top: 20px; width: 100%;">
-            <center><h3 id="videoTitle">Título do Vídeo</h3></center>
-            <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
-          </div>
-        </div>
+      <!-- Contêiner de Vídeo e Avaliação -->
+<div id="videoAndRatingContainer" style="display: flex; flex-direction: row; margin-left: 50px; margin-top: 65px; margin-right: 100px;">
+  
+  <!-- Vídeo e Área de Notas -->
+  <div id="videoPlayerSection" style="flex: 2;">
+    <button onclick="closeVideo()">FECHAR</button>
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+      <div id="videoPlayer" style="width: 800px; height: 600px; background-color: black;"></div>
+      <div style="margin-top: 20px; width: 100%;">
+        <center><h3 id="videoTitle">Título do Vídeo</h3></center>
+        <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
       </div>
+    </div>
+  </div>
+
+  <!-- Área de Avaliação de Estrelas -->
+  <div id="ratingSection" style="flex: 1; margin-left: 90px; display: none; flex-direction: column  ;">
+    <h3>Avalie o Vídeo:</h3>
+    <div class="star-rating" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+      <span class="star" data-value="5">&#9733;</span>
+      <span class="star" data-value="4">&#9733;</span>
+      <span class="star" data-value="3">&#9733;</span>
+      <span class="star" data-value="2">&#9733;</span>
+      <span class="star" data-value="1">&#9733;</span>
+    </div>
+  </div>
+  
+  </div>
     </div>
   </div>
 
@@ -141,8 +158,10 @@ function openVideo(videoSrc, title, videoIdAtual) {
   }
 
   // Mostrar a seção de vídeo
+  const ratingSection = document.getElementById('ratingSection');
   const videoSection = document.getElementById('videoPlayerSection');
   videoSection.style.display = 'flex';
+  ratingSection.style.display = 'flex';
 
   // Chamar função para contar progresso ao clicar no item
   contarProgresso(videoIdAtual);
@@ -227,33 +246,35 @@ function obterUsuarioId() {
 }
 // Função para contar progresso sem duplicar
 function contarProgresso(videoIdAtual) {
-  // Verificar se o vídeo já foi assistido
-  if (videosJaAssistidos.includes(videoIdAtual)) {
-    console.log('O vídeo já foi assistido. Progresso não será contado novamente.');
-    return; // Não contar o progresso novamente
+  // Verifica se o ID do usuário está disponível
+  if (!usuarioId) {
+    console.error('ID do usuário não foi obtido ainda!');
+    return;
   }
 
-  // Variável que conterá o número de vídeos assistidos
-  let videosAssistidos = 0;
-
-  // Busca o progresso atual no banco de dados
+  // Busca no banco de dados se o vídeo já foi assistido
   $.ajax({
-    url: '/getProgresso',
+    url: '/getProgresso', // Rota para buscar o progresso
     method: 'GET',
     data: { usuarioId: usuarioId, cursoId: 1 },
     success: function(response) {
-      videosAssistidos = response.videosAssistidos || 0;
+      const videosJaAssistidos = response.videosJaAssistidos || []; // Lista de vídeos já assistidos
 
-      // Verifica se o vídeo atual não foi contabilizado (baseado no número de vídeos assistidos)
+      // Verifica se o vídeo atual já foi assistido
+      if (videosJaAssistidos.includes(videoIdAtual)) {
+        console.log('O vídeo já foi assistido. Progresso não será contado novamente.');
+        return;
+      }
+
+      // Se o vídeo não foi assistido, incrementar o progresso
+      const videosAssistidos = response.videosAssistidos || 0;
+
       if (videosAssistidos < 3) {
-        // Incrementa o número de vídeos assistidos
-        videosAssistidos++;
+        // Incrementar o número de vídeos assistidos
+        const novoProgresso = videosAssistidos + 1;
 
-        // Adicionar o vídeo à lista de vídeos já assistidos
-        videosJaAssistidos.push(videoIdAtual);
-
-        // Salva o progresso atualizado
-        salvarProgresso(videosAssistidos, 3);
+        // Salvar o novo progresso no banco de dados
+        salvarProgresso(novoProgresso, 3, videoIdAtual); // Inclui o vídeo atual
       } else {
         console.log('Todos os vídeos já foram assistidos.');
       }
@@ -264,8 +285,8 @@ function contarProgresso(videoIdAtual) {
   });
 }
 
-// Função para salvar o progresso no banco de dados
-function salvarProgresso(videosAssistidos, totalVideos) {
+// Função para salvar o progresso e o vídeo atual no banco de dados
+function salvarProgresso(videosAssistidos, totalVideos, videoIdAtual) {
   if (!usuarioId) {
     console.error('ID do usuário não foi obtido ainda!');
     return;
@@ -277,10 +298,11 @@ function salvarProgresso(videosAssistidos, totalVideos) {
     usuarioId: usuarioId,
     cursoId: cursoId,
     videosAssistidos: videosAssistidos,
-    totalVideos: totalVideos
+    totalVideos: totalVideos,
+    videoIdAtual: videoIdAtual // Salvar o ID do vídeo assistido
   };
 
-  // Envia o progresso para o backend
+  // Envia o progresso atualizado para o backend
   $.ajax({
     url: '/salvarProgresso',
     method: 'POST',
@@ -328,6 +350,110 @@ $(document).ready(function() {
     });
   });
 });
+
+$(document).ready(function() {
+    // Selecionar todas as estrelas
+    const stars = document.querySelectorAll('.star');
+    const ratingValueDisplay = document.getElementById('ratingValueDisplay');
+    let rating = 0; // Inicializar a variável rating
+
+    // Adicionar eventos às estrelas
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            rating = this.getAttribute('data-value');
+            updateStars(rating);
+            //ratingValueDisplay.textContent = `Avaliação: ${rating} estrelas`;
+
+            // Enviar a avaliação ao servidor
+            salvarAvaliacao(rating);
+        });
+
+        star.addEventListener('mouseover', function() {
+            updateStars(this.getAttribute('data-value'));
+        });
+
+        star.addEventListener('mouseout', function() {
+            updateStars(rating);
+        });
+    });
+
+    // Função para salvar a avaliação no banco de dados
+    function salvarAvaliacao(rating) {
+        if (!usuarioId) {
+            console.error('ID do usuário não foi obtido ainda!');
+            return;
+        }
+
+        const cursoId = 1; // ID do curso
+
+        // Dados a serem enviados
+        const data = {
+            usuarioId: usuarioId,
+            cursoId: cursoId,
+            avaliacao: rating
+        };
+
+        // Requisição Ajax para enviar a avaliação ao backend
+        $.ajax({
+            url: '/salvarAvaliacao', // Rota para salvar a avaliação
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                console.log('Avaliação salva com sucesso!', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao salvar avaliação:', error);
+            }
+        });
+    }
+
+    // Função para buscar a avaliação do usuário
+    function buscarAvaliacao() {
+        if (!usuarioId) {
+            console.error('ID do usuário não foi obtido ainda!');
+            return;
+        }
+
+        const cursoId = 1; // ID do curso
+
+        // Requisição Ajax para buscar a avaliação do usuário
+        $.ajax({
+            url: '/getAvaliacao', // Rota para buscar a avaliação
+            method: 'GET',
+            data: { usuarioId: usuarioId, cursoId: cursoId },
+            success: function(response) {
+                if (response.avaliacao) {
+                    const avaliacao = response.avaliacao;
+                    updateStars(avaliacao); // Atualiza as estrelas visualmente
+                    //ratingValueDisplay.textContent = `Avaliação: ${avaliacao} estrelas`; // Mostra a avaliação
+                    rating = avaliacao; // Atualiza a variável `rating` com a avaliação recuperada
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao buscar avaliação:', error);
+            }
+        });
+    }
+
+    // Chama a função de obtenção do ID do usuário ao carregar a página
+    obterUsuarioId().then(function() {
+        // Após obter o ID do usuário, buscar a avaliação dele
+        buscarAvaliacao();
+    });
+    
+    // Função para atualizar as estrelas visualmente
+    function updateStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('selected');
+            } else {
+                star.classList.remove('selected');
+            }
+        });
+    }
+});
+
   </script>
 </body>
 
