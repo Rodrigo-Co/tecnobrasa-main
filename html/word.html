@@ -107,27 +107,29 @@
   
   <!-- Vídeo e Área de Notas -->
   <div id="videoPlayerSection" style="flex: 2;">
-    <button onclick="closeVideo()">FECHAR</button>
-    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-      <div id="videoPlayer" style="width: 800px; height: 600px; background-color: black;"></div>
-      <div style="margin-top: 20px; width: 100%;">
-        <center><h3 id="videoTitle">Título do Vídeo</h3></center>
-        <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
+    
+    <div style="display: flex; flex-direction: column; align-items: flex-start; height: 1100px;">
+      <center><h3 id="videoTitle">Título do Vídeo</h3></center>
+      <div id="videoPlayer" style="width: 1100px; height: 700px; background-color: black;"></div>
+      <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
+      
+      <!-- Área de Avaliação de Estrelas -->
+      <div id="ratingSection" style="flex: 1; margin-left: 90px; display: none; flex-direction: column;">
+        <h3>Avalie o Vídeo:</h3>
+        <div class="star-rating" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+          <span class="star" data-value="1">&#9733;</span>
+          <span class="star" data-value="2">&#9733;</span>
+          <span class="star" data-value="3">&#9733;</span>
+          <span class="star" data-value="4">&#9733;</span>
+          <span class="star" data-value="5">&#9733;</span>
+        </div>
       </div>
+    
+      <center><button onclick="closeVideo()">FECHAR</button></center>
+      <div style="margin-top: 20px; width: 100%;"></div>
     </div>
-  </div>
+    
 
-  <!-- Área de Avaliação de Estrelas -->
-  <div id="ratingSection" style="flex: 1; margin-left: 90px; display: none; flex-direction: column  ;">
-    <h3>Avalie o Vídeo:</h3>
-    <div class="star-rating" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
-      <span class="star" data-value="5">&#9733;</span>
-      <span class="star" data-value="4">&#9733;</span>
-      <span class="star" data-value="3">&#9733;</span>
-      <span class="star" data-value="2">&#9733;</span>
-      <span class="star" data-value="1">&#9733;</span>
-    </div>
-  </div>
   
   </div>
     </div>
@@ -141,6 +143,7 @@
   <script>
     let youtubePlayer; // Variável global para o player do YouTube
 let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
+
 
 // Função para abrir o vídeo e contar progresso ao clicar
 function openVideo(videoSrc, title, videoIdAtual) {
