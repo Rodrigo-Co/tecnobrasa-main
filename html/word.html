@@ -111,10 +111,10 @@
     <div style="display: flex; flex-direction: column; align-items: flex-start; height: 1100px;">
       <center><h3 id="videoTitle">Título do Vídeo</h3></center>
       <div id="videoPlayer" style="width: 1100px; height: 700px; background-color: black;"></div>
-      <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
+      <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 20px;"></textarea>
       
       <!-- Área de Avaliação de Estrelas -->
-      <div id="ratingSection" style="flex: 1; margin-left: 90px; display: none; flex-direction: column;">
+      <div id="ratingSection" style="flex: 1; margin-top: 50px; display: flex; flex-direction: column;">
         <h3>Avalie o Vídeo:</h3>
         <div class="star-rating" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
           <span class="star" data-value="1">&#9733;</span>
@@ -124,9 +124,9 @@
           <span class="star" data-value="5">&#9733;</span>
         </div>
       </div>
-    
-      <center><button onclick="closeVideo()">FECHAR</button></center>
-      <div style="margin-top: 20px; width: 100%;"></div>
+      
+      
+      <div style="margin-top: 80px; margin-bottom: 20px; width: 100%; background-color: orange;"><center><button onclick="closeVideo()">FECHAR</button></center></div>
     </div>
     
 
@@ -374,89 +374,80 @@ $(document).ready(function() {
 
     // Adicionar eventos às estrelas
     stars.forEach(star => {
-        star.addEventListener('click', function() {
-            rating = this.getAttribute('data-value');
-            updateStars(rating);
-            //ratingValueDisplay.textContent = `Avaliação: ${rating} estrelas`;
+      star.addEventListener('click', function() {
+        rating = this.getAttribute('data-value');
+        updateStars(rating);
 
-            // Enviar a avaliação ao servidor
-            salvarAvaliacao(rating);
-        });
-
-        star.addEventListener('mouseover', function() {
-            updateStars(this.getAttribute('data-value'));
-        });
-
-        star.addEventListener('mouseout', function() {
-            updateStars(rating);
-        });
+        // Enviar a avaliação ao servidor passando o videoIdAtual
+        salvarAvaliacao(rating, videoIdAtual);
+      });
     });
 
     // Função para salvar a avaliação no banco de dados
-    function salvarAvaliacao(rating) {
-        if (!usuarioId) {
-            console.error('ID do usuário não foi obtido ainda!');
-            return;
-        }
-
-        const cursoId = 1; // ID do curso
-
-        // Dados a serem enviados
-        const data = {
-            usuarioId: usuarioId,
-            cursoId: cursoId,
-            avaliacao: rating
-        };
-
-        // Requisição Ajax para enviar a avaliação ao backend
-        $.ajax({
-            url: '/salvarAvaliacao', // Rota para salvar a avaliação
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(response) {
-                console.log('Avaliação salva com sucesso!', response);
-            },
-            error: function(xhr, status, error) {
-                console.error('Erro ao salvar avaliação:', error);
-            }
-        });
+function salvarAvaliacao(rating, videoIdAtual) {
+    if (!usuarioId) {
+        console.error('ID do usuário não foi obtido ainda!');
+        return;
     }
 
-    // Função para buscar a avaliação do usuário
-    function buscarAvaliacao() {
-        if (!usuarioId) {
-            console.error('ID do usuário não foi obtido ainda!');
-            return;
+    const cursoId = 1; // ID do curso
+
+    // Dados a serem enviados
+    const data = {
+        usuarioId: usuarioId,
+        cursoId: cursoId,
+        videoId: videoIdAtual, // Inclui o videoId
+        avaliacao: rating
+    };
+
+    // Requisição Ajax para enviar a avaliação ao backend
+    $.ajax({
+        url: '/salvarAvaliacao', // Rota para salvar a avaliação
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            console.log('Avaliação salva com sucesso!', response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro ao salvar avaliação:', error);
         }
-
-        const cursoId = 1; // ID do curso
-
-        // Requisição Ajax para buscar a avaliação do usuário
-        $.ajax({
-            url: '/getAvaliacao', // Rota para buscar a avaliação
-            method: 'GET',
-            data: { usuarioId: usuarioId, cursoId: cursoId },
-            success: function(response) {
-                if (response.avaliacao) {
-                    const avaliacao = response.avaliacao;
-                    updateStars(avaliacao); // Atualiza as estrelas visualmente
-                    //ratingValueDisplay.textContent = `Avaliação: ${avaliacao} estrelas`; // Mostra a avaliação
-                    rating = avaliacao; // Atualiza a variável `rating` com a avaliação recuperada
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Erro ao buscar avaliação:', error);
-            }
-        });
-    }
-
-    // Chama a função de obtenção do ID do usuário ao carregar a página
-    obterUsuarioId().then(function() {
-        // Após obter o ID do usuário, buscar a avaliação dele
-        buscarAvaliacao();
     });
-    
+}
+
+// Função para buscar a avaliação do usuário para um vídeo específico
+function buscarAvaliacao(videoIdAtual) {
+    if (!usuarioId) {
+        console.error('ID do usuário não foi obtido ainda!');
+        return;
+    }
+
+    const cursoId = 1; // ID do curso
+
+    // Requisição Ajax para buscar a avaliação do usuário para o vídeo atual
+    $.ajax({
+        url: '/getAvaliacao', // Rota para buscar a avaliação
+        method: 'GET',
+        data: { usuarioId: usuarioId, cursoId: cursoId, videoId: videoIdAtual }, // Inclui o videoId
+        success: function(response) {
+            if (response.avaliacao) {
+                const avaliacao = response.avaliacao;
+                updateStars(avaliacao); // Atualiza as estrelas visualmente
+                rating = avaliacao; // Atualiza a variável `rating` com a avaliação recuperada
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro ao buscar avaliação:', error);
+        }
+    });
+}
+
+// Chama a função de obtenção do ID do usuário ao carregar a página
+obterUsuarioId().then(function() {
+    // Após obter o ID do usuário, buscar a avaliação para o vídeo atual
+    buscarAvaliacao(videoIdAtual);
+});    
+
     // Função para atualizar as estrelas visualmente
     function updateStars(rating) {
         stars.forEach((star, index) => {

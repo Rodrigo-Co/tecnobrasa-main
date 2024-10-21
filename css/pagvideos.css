@@ -205,7 +205,7 @@
   .star-rating {
     
     font-size: 30px;
-    direction: rtl;
+    direction: ltr; 
     display: flex;
     justify-content: flex-start;
   }
