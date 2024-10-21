@@ -2,15 +2,21 @@
     height: 750px; /* ajuste o tamanho da imagem */
     object-fit: cover; /* ajuste a imagem para cobrir o espaço */
     border-radius: 1px; /* adicione um efeito de borda arredondada */
+    filter: brightness(0.5);
   }
 
+  .dropdown-item[aria-disabled="true"] {
+    pointer-events: none; /* Desabilita o clique */
+    opacity: 0.8; /* Torna o item visualmente desabilitado */
+  }
   .carousel-item h5{
-    font-size: 70px;
-    font-family: Verdana;
-    color: #000000;
+    font-size: 70px; 
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #ffffff;
   }
   .carousel-item p{
     font-size: 30px;
+    color: #fcac17;
   }
   .dropdown-menu {
     top: 100%;

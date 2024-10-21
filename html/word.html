@@ -141,8 +141,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    let youtubePlayer; // Variável global para o player do YouTube
-let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
+  let youtubePlayer; // Variável global para o player do YouTube
+  let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
 
 
 // Função para abrir o vídeo e contar progresso ao clicar
@@ -252,7 +252,7 @@ function contarProgresso(videoIdAtual) {
   // Verifica se o ID do usuário está disponível
   if (!usuarioId) {
     console.error('ID do usuário não foi obtido ainda!');
-    return;
+    return;  // Impede a continuação se o ID do usuário não estiver disponível
   }
 
   // Busca no banco de dados se o vídeo já foi assistido
@@ -276,8 +276,8 @@ function contarProgresso(videoIdAtual) {
         // Incrementar o número de vídeos assistidos
         const novoProgresso = videosAssistidos + 1;
 
-        // Salvar o novo progresso no banco de dados
-        salvarProgresso(novoProgresso, 3, videoIdAtual); // Inclui o vídeo atual
+        // Salvar o novo progresso no banco de dados e atualizar a barra de progresso
+        salvarProgresso(novoProgresso, 3, videoIdAtual); // Inclui o vídeo atual e a lista de vídeos assistidos
       } else {
         console.log('Todos os vídeos já foram assistidos.');
       }
@@ -287,6 +287,7 @@ function contarProgresso(videoIdAtual) {
     }
   });
 }
+
 
 // Função para salvar o progresso e o vídeo atual no banco de dados
 function salvarProgresso(videosAssistidos, totalVideos, videoIdAtual) {
@@ -305,25 +306,35 @@ function salvarProgresso(videosAssistidos, totalVideos, videoIdAtual) {
     videoIdAtual: videoIdAtual // Salvar o ID do vídeo assistido
   };
 
+  // Verifica se o vídeo atual já foi assistido
+  if (videosJaAssistidos.includes(videoIdAtual)) {
+        console.log('O vídeo já foi assistido. Nenhuma atualização será feita.');
+        return;  // Interrompe o processo aqui se o vídeo já foi assistido
+      }
+
+
   // Envia o progresso atualizado para o backend
   $.ajax({
-    url: '/salvarProgresso',
-    method: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify(data),
-    success: function(response) {
-      console.log('Progresso salvo com sucesso!', response);
+        url: '/salvarProgresso',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            console.log('Resposta do backend:', response);
 
-      // Atualiza a barra de progresso visualmente apenas se o progresso foi salvo corretamente
-      const progresso = Math.min((videosAssistidos / totalVideos) * 100, 100);
-
-      // Atualiza a barra de progresso visualmente
-      atualizarBarraProgresso(progresso);
-    },
-    error: function(xhr, status, error) {
-      console.error('Erro ao salvar progresso:', error);
-    }
-  });
+            if (response.message.includes('Vídeo já assistido')) {
+                // O vídeo já foi assistido, não atualize a barra de progresso
+                console.log('O vídeo já foi assistido, progresso não será atualizado.');
+            } else {
+                // O vídeo não foi assistido antes, atualize a barra de progresso
+                const progressoatual = Math.min((videosAssistidos / totalVideos) * 100, 100);
+                atualizarBarraProgresso(progressoatual);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro ao salvar progresso:', error);
+        }
+    });
 }
 
 // Função para atualizar a barra de progresso
