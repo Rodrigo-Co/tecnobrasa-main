@@ -190,7 +190,7 @@ function loadYouTubePlayer(videoId) {
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     const videoIdAtual = youtubePlayer.getVideoData().video_id; // Pegar o ID correto do vídeo
-    contarProgresso(videoIdAtual);
+
   }
 }
 
@@ -265,8 +265,8 @@ function contarProgresso(videoIdAtual) {
 
       // Verifica se o vídeo atual já foi assistido
       if (videosJaAssistidos.includes(videoIdAtual)) {
-        console.log('O vídeo já foi assistido. Progresso não será contado novamente.');
-        return;
+        console.log('O vídeo já foi assistido. Nenhuma atualização será feita.');
+        return;  // Interrompe o processo aqui se o vídeo já foi assistido
       }
 
       // Se o vídeo não foi assistido, incrementar o progresso
@@ -314,6 +314,7 @@ function salvarProgresso(videosAssistidos, totalVideos, videoIdAtual) {
     success: function(response) {
       console.log('Progresso salvo com sucesso!', response);
 
+      // Atualiza a barra de progresso visualmente apenas se o progresso foi salvo corretamente
       const progresso = Math.min((videosAssistidos / totalVideos) * 100, 100);
 
       // Atualiza a barra de progresso visualmente

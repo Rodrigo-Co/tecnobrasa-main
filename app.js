@@ -392,12 +392,17 @@ app.post('/verificarCadastro', (req, res) => {
 app.post('/salvarProgresso', (req, res) => {
     const { usuarioId, cursoId, videoIdAtual, totalVideos } = req.body;
 
+    // Validar se todos os dados necessários foram enviados
+    if (!usuarioId || !cursoId || !videoIdAtual || !totalVideos) {
+        return res.status(400).json({ message: 'Dados insuficientes para salvar progresso.' });
+    }
+
     // Validar para que o número de vídeos assistidos não exceda o total de vídeos
     const queryCheck = 'SELECT * FROM progresso_usuario WHERE usuarioId = ? AND cursoId = ?';
     
     db.query(queryCheck, [usuarioId, cursoId], (err, results) => {
         if (err) {
-            console.error(err);
+            console.error('Erro ao verificar progresso:', err);
             return res.status(500).json({ message: 'Erro ao verificar progresso.' });
         }
 
@@ -407,20 +412,20 @@ app.post('/salvarProgresso', (req, res) => {
         const queryCheckVideo = 'SELECT * FROM videos_assistidos WHERE usuarioId = ? AND cursoId = ? AND videoId = ?';
         db.query(queryCheckVideo, [usuarioId, cursoId, videoIdAtual], (err, videoResults) => {
             if (err) {
-                console.error(err);
+                console.error('Erro ao verificar se o vídeo foi assistido:', err);
                 return res.status(500).json({ message: 'Erro ao verificar se o vídeo foi assistido.' });
             }
 
             if (videoResults.length > 0) {
                 // O vídeo já foi assistido
                 console.log('Vídeo já assistido. Progresso não será atualizado.');
-                return res.json({ message: 'Vídeo já assistido. Progresso não atualizado.', progresso: results[0].progresso });
+                return res.json({ message: 'Vídeo já assistido. Progresso não atualizado.', progresso: results[0]?.progresso || 0 });
             } else {
                 // Adicionar o vídeo à tabela de vídeos assistidos
                 const queryInsertVideo = 'INSERT INTO videos_assistidos (usuarioId, cursoId, videoId) VALUES (?, ?, ?)';
                 db.query(queryInsertVideo, [usuarioId, cursoId, videoIdAtual], (err, result) => {
                     if (err) {
-                        console.error(err);
+                        console.error('Erro ao registrar vídeo assistido:', err);
                         return res.status(500).json({ message: 'Erro ao registrar vídeo assistido.' });
                     }
 
@@ -435,7 +440,7 @@ app.post('/salvarProgresso', (req, res) => {
                         const queryUpdate = 'UPDATE progresso_usuario SET videosAssistidos = ?, progresso = ? WHERE usuarioId = ? AND cursoId = ?';
                         db.query(queryUpdate, [videosAssistidos, progresso, usuarioId, cursoId], (err, result) => {
                             if (err) {
-                                console.error(err);
+                                console.error('Erro ao atualizar progresso:', err);
                                 return res.status(500).json({ message: 'Erro ao atualizar progresso.' });
                             }
                             res.json({ message: 'Progresso atualizado com sucesso!', progresso });
@@ -445,7 +450,7 @@ app.post('/salvarProgresso', (req, res) => {
                         const queryInsert = 'INSERT INTO progresso_usuario (usuarioId, cursoId, videosAssistidos, progresso) VALUES (?, ?, ?, ?)';
                         db.query(queryInsert, [usuarioId, cursoId, videosAssistidos, progresso], (err, result) => {
                             if (err) {
-                                console.error(err);
+                                console.error('Erro ao salvar progresso:', err);
                                 return res.status(500).json({ message: 'Erro ao salvar progresso.' });
                             }
                             res.json({ message: 'Progresso salvo com sucesso!', progresso });
