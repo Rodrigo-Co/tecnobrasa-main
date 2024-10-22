@@ -205,18 +205,15 @@
   .star-rating {
     
     font-size: 30px;
-    direction: ltr; 
+    direction: ltr;
     display: flex;
     justify-content: flex-start;
   }
   .star {
+
     cursor: pointer;
     color: #d3d3d3;
     margin-right: 5px;
-  }
-  .star:hover,
-  .star:hover ~ .star {
-    color: gold;
   }
   .star.selected {
     color: gold;

@@ -21,14 +21,14 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Configuração do body-parser
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Configuração do banco de dados
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -549,10 +549,10 @@ app.get('/user/favorites', (req, res) => {
 });
 
 app.post('/salvarAvaliacao', (req, res) => {
-    const { usuarioId, cursoId, avaliacao } = req.body;
+    const { usuarioId, cursoId, videoId, avaliacao } = req.body;
 
     // Executa a query
-    db.query('INSERT INTO avaliacoes (usuarioId, cursoId, avaliacao) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE avaliacao = ?', [usuarioId, cursoId, avaliacao, avaliacao], (err, results) => {
+    db.query('INSERT INTO avaliacoes (usuarioId, cursoId, videoId, avaliacao) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE avaliacao = ?', [usuarioId, cursoId, videoId,avaliacao, avaliacao], (err, results) => {
         if (err) {
             console.error('Erro ao salvar avaliação:', err);
             res.status(500).json({ success: false, message: 'Erro ao salvar avaliação.' });
@@ -564,9 +564,9 @@ app.post('/salvarAvaliacao', (req, res) => {
 });
 
 app.get('/getAvaliacao', (req, res) => {
-    const { usuarioId, cursoId } = req.query;
+    const { usuarioId, cursoId, videoId } = req.query;
 
-    db.query('SELECT avaliacao FROM avaliacoes WHERE usuarioId = ? AND cursoId = ?', [usuarioId, cursoId], (err, results) => {
+    db.query('SELECT avaliacao FROM avaliacoes WHERE usuarioId = ? AND cursoId = ? AND videoId = ?', [usuarioId, cursoId, videoId], (err, results) => {
         if (err) {
             console.error('Erro ao buscar avaliação:', err);
             res.status(500).json({ success: false, message: 'Erro ao buscar avaliação.' });
