@@ -102,18 +102,37 @@
       </div>
     </div>
     
-    <!-- Vídeo e Área de Notas -->
-    <div id="videoPlayerSection" style="flex: 2; margin-left: 10px; margin-top: -65px;">
-      <button onclick="closeVideo()">Fechar</button>
-      <div style="display: flex; flex-direction: column; align-items: flex-start;">
-        <div id="videoPlayer" style="width: 800px; height: 600px;" ></div>
-        <div style="margin-top: 20px; width: 100%;">
-          <center><h3 id="videoTitle">Título do Vídeo</h3></center>
-          <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 10px;"></textarea>
+     <!-- Contêiner de Vídeo e Avaliação -->
+<div id="videoAndRatingContainer" style="display: flex; flex-direction: row; margin-left: 50px; margin-top: 65px; margin-right: 100px;">
+  
+  <!-- Vídeo e Área de Notas -->
+  <div id="videoPlayerSection" style="flex: 2;">
+    
+    <div style="display: flex; flex-direction: column; align-items: flex-start; height: 1100px;">
+      <center><h3 id="videoTitle">Título do Vídeo</h3></center>
+      <div id="videoPlayer" style="width: 1100px; height: 700px; background-color: black;"></div>
+      <textarea id="videoNotes" rows="8" cols="50" placeholder="Escreva suas anotações aqui..." style="width: 100%; margin-top: 20px;"></textarea>
+      
+      <!-- Área de Avaliação de Estrelas -->
+      <div id="ratingSection" style="flex: 1; margin-top: 50px; display: flex; flex-direction: column;">
+        <h3>Avalie o Vídeo:</h3>
+        <div class="star-rating" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+          <span class="star" data-value="1">&#9733;</span>
+          <span class="star" data-value="2">&#9733;</span>
+          <span class="star" data-value="3">&#9733;</span>
+          <span class="star" data-value="4">&#9733;</span>
+          <span class="star" data-value="5">&#9733;</span>
         </div>
       </div>
+      
+      
+      <div style="margin-top: 80px; margin-bottom: 20px; width: 100%; background-color: orange;"><center><button onclick="closeVideo()">FECHAR</button></center></div>
     </div>
+    
+
+  
   </div>
+    </div>
   </div>
 
   <!-- Scripts -->
@@ -123,212 +142,365 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     let youtubePlayer; // Variável global para o player do YouTube
-let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
-
-// Função para abrir o vídeo e contar progresso ao clicar
-function openVideo(videoSrc, title, videoIdAtual) {
-  // Atualizar o título do vídeo
-  document.getElementById('videoTitle').innerText = title;
-
-  if (videoSrc.includes('youtube.com')) {
-    // Caso seja um vídeo do YouTube
-    const videoId = videoSrc.split('/embed/')[1]; // Pegar o ID do vídeo do YouTube
-    loadYouTubePlayer(videoId);
-  } else {
-    // Caso seja um vídeo local
-    const videoPlayer = document.getElementById('videoPlayer');
-    videoPlayer.innerHTML = `<iframe src="${videoSrc}" width="800" height="600" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }
-
-  // Mostrar a seção de vídeo
-  const videoSection = document.getElementById('videoPlayerSection');
-  videoSection.style.display = 'flex';
-
-  // Chamar função para contar progresso ao clicar no item
-  contarProgresso(videoIdAtual);
-}
-
-// Função para carregar o player do YouTube
-function loadYouTubePlayer(videoId) {
-  if (!youtubePlayer) {
-    // Criar o player se ainda não foi criado
-    youtubePlayer = new YT.Player('videoPlayer', {
-      height: '600',
-      width: '800',
-      videoId: videoId,
-    });
-  } else {
-    // Se o player já existe, carregue um novo vídeo
-    youtubePlayer.loadVideoById(videoId);
-    youtubePlayer.seekTo(0);
-  }
-}
-
-// Verifica o estado do vídeo do YouTube
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    const videoIdAtual = youtubePlayer.getVideoData().video_id; // Pegar o ID correto do vídeo
-    contarProgresso(videoIdAtual);
-  }
-}
-
-function closeVideo() {
-  const videoSection = document.getElementById('videoPlayerSection');
-  videoSection.style.display = 'none';
-
-  if (youtubePlayer) {
-    youtubePlayer.stopVideo(); // Parar o vídeo do YouTube
-  }
-}
+    let videosJaAssistidos = []; // Lista para armazenar os vídeos já assistidos
+    let videoIdAtual;
   
-    // Ativar/desativar o menu lateral
-    $('#menu-toggle').on('click', function () {
-      $('#sidebar').toggleClass('active');
-      $('#content').toggleClass('shifted');
-    });
+  // Função para abrir o vídeo e contar progresso ao clicar
+  function openVideo(videoSrc, title, videoId) {
+    // Atualizar o título do vídeo
+    document.getElementById('videoTitle').innerText = title;
   
-    // Quando o documento estiver pronto, faça a requisição para obter os dados do usuário logado
-    $(document).ready(function() {
-        $.ajax({
-            url: '/user/profile', // URL da rota no backend
-            method: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    // Atualiza o nome do usuário
-                    $('#nomeusuario').text(response.nome);
-
-                    // Atualiza a imagem do usuário
-                    $('#imguserelement').attr('src', response.profileImage);
-                } else {
-                    console.error('Erro ao carregar informações do usuário:', response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Erro na requisição:', error);
-            }
-        });
-    });
-    let usuarioId; // Declarar uma variável global para armazenar o usuarioId
-    // Fazer a requisição para buscar o ID do usuário
-function obterUsuarioId() {
-    return $.ajax({
-        url: '/getUsuarioId',
-        method: 'GET',
-        success: function(response) {
-            if (response.usuarioId) {
-                usuarioId = response.usuarioId; // Armazenar o ID do usuário na variável global
-                //console.log('ID do usuário:', usuarioId);  Para verificar se o ID foi obtido
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Erro ao buscar ID do usuário:', error);
-        }
-    });
-}
-// Função para contar progresso sem duplicar
-function contarProgresso(videoIdAtual) {
-  // Verificar se o vídeo já foi assistido
-  if (videosJaAssistidos.includes(videoIdAtual)) {
-    console.log('O vídeo já foi assistido. Progresso não será contado novamente.');
-    return; // Não contar o progresso novamente
-  }
-
-  // Variável que conterá o número de vídeos assistidos
-  let videosAssistidos = 0;
-
-  // Busca o progresso atual no banco de dados
-  $.ajax({
-    url: '/getProgresso',
-    method: 'GET',
-    data: { usuarioId: usuarioId, cursoId: 2 },
-    success: function(response) {
-      videosAssistidos = response.videosAssistidos || 0;
-
-      // Verifica se o vídeo atual não foi contabilizado (baseado no número de vídeos assistidos)
-      if (videosAssistidos < 3) {
-        // Incrementa o número de vídeos assistidos
-        videosAssistidos++;
-
-        // Adicionar o vídeo à lista de vídeos já assistidos
-        videosJaAssistidos.push(videoIdAtual);
-
-        // Salva o progresso atualizado
-        salvarProgresso(videosAssistidos, 3);
-      } else {
-        console.log('Todos os vídeos já foram assistidos.');
-      }
-    },
-    error: function(xhr, status, error) {
-      console.error('Erro ao buscar progresso:', error);
+    // Definir o videoIdAtual globalmente
+    videoIdAtual = videoId; 
+  
+    resetStars();
+  
+    if (videoSrc.includes('youtube.com')) {
+      // Caso seja um vídeo do YouTube
+      const videoIdYouTube = videoSrc.split('/embed/')[1]; // Pegar o ID do vídeo do YouTube
+      loadYouTubePlayer(videoIdYouTube);
+    } else {
+      // Caso seja um vídeo local
+      const videoPlayer = document.getElementById('videoPlayer');
+      videoPlayer.innerHTML = `<iframe src="${videoSrc}" width="800" height="600" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     }
-  });
-}
-
-// Função para salvar o progresso no banco de dados
-function salvarProgresso(videosAssistidos, totalVideos) {
-  if (!usuarioId) {
-    console.error('ID do usuário não foi obtido ainda!');
-    return;
+  
+    // Mostrar a seção de vídeo
+    const ratingSection = document.getElementById('ratingSection');
+    const videoSection = document.getElementById('videoPlayerSection');
+    videoSection.style.display = 'flex';
+    ratingSection.style.display = 'flex';
+  
+    // Chamar função para contar progresso ao clicar no item
+    contarProgresso(videoId);
+  
+    buscarAvaliacao();
   }
-
-  const cursoId = 2; // ID do curso
-
-  const data = {
-    usuarioId: usuarioId,
-    cursoId: cursoId,
-    videosAssistidos: videosAssistidos,
-    totalVideos: totalVideos
-  };
-
-  // Envia o progresso para o backend
-  $.ajax({
-    url: '/salvarProgresso',
-    method: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify(data),
-    success: function(response) {
-      console.log('Progresso salvo com sucesso!', response);
-
-      const progresso = Math.min((videosAssistidos / totalVideos) * 100, 100);
-
-      // Atualiza a barra de progresso visualmente
-      atualizarBarraProgresso(progresso);
-    },
-    error: function(xhr, status, error) {
-      console.error('Erro ao salvar progresso:', error);
+  
+  // Função para carregar o player do YouTube
+  function loadYouTubePlayer(videoId) {
+    if (!youtubePlayer) {
+      // Criar o player se ainda não foi criado
+      youtubePlayer = new YT.Player('videoPlayer', {
+        height: '600',
+        width: '800',
+        videoId: videoId,
+      });
+    } else {
+      // Se o player já existe, carregue um novo vídeo
+      youtubePlayer.loadVideoById(videoId);
+      youtubePlayer.seekTo(0);
     }
-  });
-}
-
-// Função para atualizar a barra de progresso
-function atualizarBarraProgresso(progresso) {
-  const progressBar = document.getElementById('progress-bar');
-  const progressoLimitado = Math.min(progresso, 100); // Limita o progresso a 100%
-  progressBar.style.width = `${progressoLimitado}%`; // Define a largura em porcentagem
-  progressBar.innerText = `${progressoLimitado.toFixed(0)}%`; // Atualiza o texto da barra
-  console.log('Barra de progresso atualizada para:', progressoLimitado + '%');
-}
-
-// Chamar a função de obtenção do ID do usuário assim que a página carregar
-$(document).ready(function() {
-  obterUsuarioId().then(function() {
-    // Fazer requisição para buscar o progresso do curso
+  }
+  
+  // Verifica o estado do vídeo do YouTube
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+      const videoIdAtual = youtubePlayer.getVideoData().video_id; // Pegar o ID correto do vídeo
+  
+    }
+  }
+  
+  function closeVideo() {
+    const videoSection = document.getElementById('videoPlayerSection');
+    videoSection.style.display = 'none';
+  
+    if (youtubePlayer) {
+      youtubePlayer.stopVideo(); // Parar o vídeo do YouTube
+    }
+  }
+    
+      // Ativar/desativar o menu lateral
+      $('#menu-toggle').on('click', function () {
+        $('#sidebar').toggleClass('active');
+        $('#content').toggleClass('shifted');
+      });
+    
+      // Quando o documento estiver pronto, faça a requisição para obter os dados do usuário logado
+      $(document).ready(function() {
+          $.ajax({
+              url: '/user/profile', // URL da rota no backend
+              method: 'GET',
+              success: function(response) {
+                  if (response.success) {
+                      // Atualiza o nome do usuário
+                      $('#nomeusuario').text(response.nome);
+  
+                      // Atualiza a imagem do usuário
+                      $('#imguserelement').attr('src', response.profileImage);
+                  } else {
+                      console.error('Erro ao carregar informações do usuário:', response.message);
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error('Erro na requisição:', error);
+              }
+          });
+      });
+      let usuarioId; // Declarar uma variável global para armazenar o usuarioId
+      // Fazer a requisição para buscar o ID do usuário
+  function obterUsuarioId() {
+      return $.ajax({
+          url: '/getUsuarioId',
+          method: 'GET',
+          success: function(response) {
+              if (response.usuarioId) {
+                  usuarioId = response.usuarioId; // Armazenar o ID do usuário na variável global
+                  //console.log('ID do usuário:', usuarioId);  Para verificar se o ID foi obtido
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error('Erro ao buscar ID do usuário:', error);
+          }
+      });
+  }
+  // Função para contar progresso sem duplicar
+  function contarProgresso(videoIdAtual) {
+    // Verifica se o ID do usuário está disponível
+    if (!usuarioId) {
+      console.error('ID do usuário não foi obtido ainda!');
+      return;  // Impede a continuação se o ID do usuário não estiver disponível
+    }
+  
+    // Busca no banco de dados se o vídeo já foi assistido
     $.ajax({
-      url: '/getProgresso',
+      url: '/getProgresso', // Rota para buscar o progresso
       method: 'GET',
       data: { usuarioId: usuarioId, cursoId: 2 },
       success: function(response) {
-        const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
-        console.log('Progresso recuperado:', progresso); // Verificar o progresso recuperado
-        atualizarBarraProgresso(progresso); // Atualiza a barra de progresso
+        const videosJaAssistidos = response.videosJaAssistidos || []; // Lista de vídeos já assistidos
+  
+        // Verifica se o vídeo atual já foi assistido
+        if (videosJaAssistidos.includes(videoIdAtual)) {
+          console.log('O vídeo já foi assistido. Nenhuma atualização será feita.');
+          return;  // Interrompe o processo aqui se o vídeo já foi assistido
+        }
+  
+        // Se o vídeo não foi assistido, incrementar o progresso
+        const videosAssistidos = response.videosAssistidos || 0;
+  
+        if (videosAssistidos < 3) {
+          // Incrementar o número de vídeos assistidos
+          const novoProgresso = videosAssistidos + 1;
+  
+          // Salvar o novo progresso no banco de dados e atualizar a barra de progresso
+          salvarProgresso(novoProgresso, 3, videoIdAtual); // Inclui o vídeo atual e a lista de vídeos assistidos
+        } else {
+          console.log('Todos os vídeos já foram assistidos.');
+        }
       },
       error: function(xhr, status, error) {
         console.error('Erro ao buscar progresso:', error);
       }
     });
+  }
+  
+  
+  // Função para salvar o progresso e o vídeo atual no banco de dados
+  function salvarProgresso(videosAssistidos, totalVideos, videoIdAtual) {
+    if (!usuarioId) {
+      console.error('ID do usuário não foi obtido ainda!');
+      return;
+    }
+  
+    const cursoId = 2; // ID do curso
+  
+    const data = {
+      usuarioId: usuarioId,
+      cursoId: cursoId,
+      videosAssistidos: videosAssistidos,
+      totalVideos: totalVideos,
+      videoIdAtual: videoIdAtual // Salvar o ID do vídeo assistido
+    };
+  
+    // Verifica se o vídeo atual já foi assistido
+    if (videosJaAssistidos.includes(videoIdAtual)) {
+          console.log('O vídeo já foi assistido. Nenhuma atualização será feita.');
+          return;  // Interrompe o processo aqui se o vídeo já foi assistido
+        }
+  
+  
+    // Envia o progresso atualizado para o backend
+    $.ajax({
+          url: '/salvarProgresso',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          success: function(response) {
+              console.log('Resposta do backend:', response);
+  
+              if (response.message.includes('Vídeo já assistido')) {
+                  // O vídeo já foi assistido, não atualize a barra de progresso
+                  console.log('O vídeo já foi assistido, progresso não será atualizado.');
+              } else {
+                  // O vídeo não foi assistido antes, atualize a barra de progresso
+                  const progressoatual = Math.min((videosAssistidos / totalVideos) * 100, 100);
+                  atualizarBarraProgresso(progressoatual);
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error('Erro ao salvar progresso:', error);
+          }
+      });
+  }
+  
+  // Função para atualizar a barra de progresso
+  function atualizarBarraProgresso(progresso) {
+    const progressBar = document.getElementById('progress-bar');
+    const progressoLimitado = Math.min(progresso, 100); // Limita o progresso a 100%
+    progressBar.style.width = `${progressoLimitado}%`; // Define a largura em porcentagem
+    progressBar.innerText = `${progressoLimitado.toFixed(0)}%`; // Atualiza o texto da barra
+    console.log('Barra de progresso atualizada para:', progressoLimitado + '%');
+  }
+  
+  // Chamar a função de obtenção do ID do usuário assim que a página carregar
+  $(document).ready(function() {
+    obterUsuarioId().then(function() {
+      // Fazer requisição para buscar o progresso do curso
+      $.ajax({
+        url: '/getProgresso',
+        method: 'GET',
+        data: { usuarioId: usuarioId, cursoId: 2 },
+        success: function(response) {
+          const progresso = Math.min((response.videosAssistidos / 3) * 100, 100); // Exemplo com 3 vídeos
+          console.log('Progresso recuperado:', progresso); // Verificar o progresso recuperado
+          atualizarBarraProgresso(progresso); // Atualiza a barra de progresso
+        },
+        error: function(xhr, status, error) {
+          console.error('Erro ao buscar progresso:', error);
+        }
+      });
+    });
   });
-});
-  </script>
+  
+  $(document).ready(function() {
+      // Selecionar todas as estrelas
+      const stars = document.querySelectorAll('.star');
+      const ratingValueDisplay = document.getElementById('ratingValueDisplay');
+      let rating = 0; // Inicializar a variável rating
+  
+      stars.forEach((star, index) => {
+          // Evento para acender as estrelas ao passar o mouse
+          star.addEventListener('mouseover', function() {
+              updateStars(index + 1); // Temporariamente acende até a estrela do mouseover
+          });
+  
+          // Evento para restaurar a avaliação ao remover o mouse
+          star.addEventListener('mouseout', function() {
+              updateStars(rating); // Restaura o estado visual com base na avaliação clicada
+          });
+  
+          // Evento de clique para definir a avaliação
+          star.addEventListener('click', function() {
+              rating = index + 1; // Define o rating baseado na estrela clicada
+              updateStars(rating); // Atualiza as estrelas permanentemente
+              salvarAvaliacao(rating, videoIdAtual); // Função para salvar a avaliação
+          });
+      });
+      // Função para atualizar as estrelas visualmente
+      function updateStars(rating) {
+          stars.forEach((star, index) => {
+              if (index < rating) {
+                  star.classList.add('selected'); // Adiciona a classe 'selected' para estrelas clicadas ou hovered
+              } else {
+                  star.classList.remove('selected'); // Remove a classe 'selected' das estrelas não selecionadas
+              }
+          });
+      }
+  });
+  
+  
+      // Função para salvar a avaliação no banco de dados
+  function salvarAvaliacao(rating) {
+      if (!usuarioId) {
+          console.error('ID do usuário não foi obtido ainda!');
+          return;
+      }
+  
+      console.log('Video ID atual ao salvar avaliação:', videoIdAtual);
+  
+      const cursoId = 2; // ID do curso
+      const videoId = videoIdAtual;
+  
+      // Dados a serem enviados
+      const data = {
+          usuarioId: usuarioId,
+          cursoId: cursoId,
+          videoId: videoId, // Inclui o videoId
+          avaliacao: rating
+      };
+  
+      // Requisição Ajax para enviar a avaliação ao backend
+      $.ajax({
+          url: '/salvarAvaliacao', // Rota para salvar a avaliação
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          success: function(response) {
+              console.log('Avaliação salva com sucesso!', response);
+          },
+          error: function(xhr, status, error) {
+              console.error('Erro ao salvar avaliação:', error);
+          }
+      });
+  }
+  
+  // Função para buscar a avaliação do usuário para um vídeo específico
+  function buscarAvaliacao() {
+      if (!usuarioId) {
+          console.error('ID do usuário não foi obtido ainda!');
+          return;
+      }
+  
+      const cursoId = 2; // ID do curso
+      const videoId = videoIdAtual;
+  
+      resetStars();
+  
+      // Requisição Ajax para buscar a avaliação do usuário para o vídeo atual
+      $.ajax({
+          url: '/getAvaliacao', // Rota para buscar a avaliação
+          method: 'GET',
+          data: { usuarioId: usuarioId, cursoId: cursoId, videoId: videoId }, // Inclui o videoId
+          success: function(response) {
+              if (response.avaliacao) {
+                  const avaliacao = response.avaliacao;
+                  updateStars(avaliacao); // Atualiza as estrelas visualmente
+                  rating = avaliacao; // Atualiza a variável `rating` com a avaliação recuperada
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error('Erro ao buscar avaliação:', error);
+          }
+      });
+  }
+  // Função para atualizar as estrelas visualmente
+  function updateStars(rating) {
+      const stars = document.querySelectorAll('.star'); // Certifique-se de selecionar as estrelas dentro da função
+      stars.forEach((star, index) => {
+          if (index < rating) {
+              star.classList.add('selected');
+          } else {
+              star.classList.remove('selected');
+          }
+      });
+  }
+  
+  // Chama a função de obtenção do ID do usuário ao carregar a página
+  obterUsuarioId().then(function() {
+      // Após obter o ID do usuário, buscar a avaliação para o vídeo atual
+      buscarAvaliacao();
+  });    
+  
+  function resetStars() {
+      const stars = document.querySelectorAll('.star');
+      stars.forEach(star => {
+          star.classList.remove('selected'); // Remove a seleção das estrelas
+      });
+      rating = 0; // Reseta a variável `rating` para garantir que a avaliação comece do zero
+  }
+  
+    </script>
 </body>
 
 </html>

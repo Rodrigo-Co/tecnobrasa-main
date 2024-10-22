@@ -1,6 +1,6 @@
 create database IF NOT EXISTS bancotb;
 use bancotb;
-
+drop database bancotb;
 create table IF NOT EXISTS usuario(
 idusuario int primary key auto_increment not null,
 nome varchar(70) not null,

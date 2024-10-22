@@ -77,10 +77,12 @@ body::-webkit-scrollbar-thumb:hover {
   margin: 0 10px;
   background-color: #E59500;
   transition: all 0.5s;
+  
 }
 .settings-page .settings-container .settings-section .my-form .form-group.editable .input-group .btn:hover {
   color: #E59500;
   background-color: #E5DADA;
+  
 }
 .settings-page .settings-container .settings-section .my-form .form-group.editable .input-group i {
   cursor: pointer;
@@ -181,6 +183,7 @@ body::-webkit-scrollbar-thumb:hover {
   background-color: transparent;
   border: 0;
   color: #E59500;
+  
 }
 
 .my-form {
@@ -217,4 +220,13 @@ body::-webkit-scrollbar-thumb:hover {
 }
 .my-form .form-submit .btn:not(:disabled):not(.disabled) {
   background-color: #E59500;
+  cursor: pointer;
+}
+#voltar{
+  padding: 10px;
+  font-size: 20px;
+  background-color: #E59500;
+  border-radius: 5px;
+  border: 10px;
+  color: aliceblue;
 }
