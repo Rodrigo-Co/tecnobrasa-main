@@ -119,6 +119,7 @@ body::-webkit-scrollbar-thumb:hover {
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
+  margin-left: -5px;
   
 }
 .img-upload-container {
@@ -230,3 +231,8 @@ body::-webkit-scrollbar-thumb:hover {
   border: 10px;
   color: aliceblue;
 }
+#userName:focus {
+  outline: none; /* Remove o contorno padrão */
+  border-bottom: 2px solid #007bff; /* Borda azul quando focado */
+}
+

@@ -12,7 +12,7 @@
 <!-- partial:index.partial.html -->
 <div class="settings-page">
   <div class="settings-container">
-    <a id="voltar" href="/pagaluno.html"> ⬅ VOLTAR</a><br><br>
+    <a id="voltar" href="/pagaluno.html" style="text-decoration: none;"> ⬅ VOLTAR</a><br><br>
     <h1 class="page-title">Conta</h1>
     <div class="settings-section">
       <h2 class="settings-title">Meu Perfil</h2>
@@ -21,10 +21,10 @@
           <label class="img-upload btn btn-bwm" id="imageLabel" for="profileImage">
             <div class="img-preview-container">
               <div class="img-preview" id="imgPreview">
-                <img src="default-profile.png" alt="Preview" id="imagePreviewElement"> <!-- Coloque uma imagem padrão -->
+                <img src="/uploads/default-profile.png" alt="Preview" id="imagePreviewElement"> <!-- Coloque uma imagem padrão -->
               </div>
             </div>
-            <i class="fas fa-upload"></i> Escolher Imagem
+            <i></i> 
           </label>
           <input type="file" accept=".jpg, .png, .jpeg, .gif" name="profileImage" id="profileImage" style= "display: none;">
           <h4 id="changeProfileText">Altere sua foto de perfil</h4> <!-- Adicionado id -->
@@ -40,21 +40,22 @@
     </div>
     <div class="settings-section">
       <h2 class="settings-title">informações Gerais</h2>
-   <div>
-     <div class="non-active-form">
-       <p class="capitalize">Rodrigo</p>
-     </div>
-    </div>
-    <div>
-      <div class="non-active-form">
-        <p>rodrigoconcei190@gmail.com</p>
+      <div>
+        <div class="non-active-form">
+          <p class="capitalize" id="userName" contenteditable="true">Nome do usuário</p><i id="edit-name" style="cursor: pointer;">✏</i>
+          
+        </div>
       </div>
-    </div>
+      <div>
+        <div class="non-active-form">
+          <p id="userEmail">E-mail do usuário</p>
+        </div>
+      </div>
   </div>
 
 <div class="settings-section">
   <h2 class="settings-title">Senha</h2>
-  <form class="form my-form">
+  <form id="changePasswordForm" class="form my-form">
     <div class="form-group">
       <div class="input-group">
         <input name="currentPassword" placeholder="Senha Anterior" type="password" class="form-control" autocomplete="Old Password" value="">
@@ -74,6 +75,9 @@
 </div>
 </div>
 </div>
+
+
+
 <!-- partial -->
 <script>
   const inputElement = document.getElementById('profileImage');
@@ -149,6 +153,140 @@
       });
   };
   
+  // Quando a página carregar, busca os dados do usuário logado
+  window.onload = function() {
+    fetch('/getData') // Requisição para a rota que busca os dados do usuário
+      .then(response => response.json())
+      .then(data => {
+        // Verifica se houve um erro
+        if (data.error) {
+          console.error('Erro:', data.error);
+        } else {
+          // Insere os dados do usuário nos elementos HTML
+          document.getElementById('userName').innerText = data.nome;
+          document.getElementById('userEmail').innerText = data.email;
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao buscar os dados do usuário:', error);
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      });
+  };
+
+
+
+  const form = document.getElementById('changePasswordForm');
+  const currentPasswordInput = form.querySelector('input[name="currentPassword"]');
+  const newPasswordInput = form.querySelector('input[name="password"]');
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  // Função para habilitar o botão se ambas as senhas estiverem preenchidas
+  function toggleSubmitButton() {
+    if (currentPasswordInput.value && newPasswordInput.value) {
+      submitButton.disabled = false;
+    } else {
+      submitButton.disabled = true;
+    }
+  }
+
+  // Verifica se os campos de senha estão preenchidos para habilitar o botão
+  currentPasswordInput.addEventListener('input', toggleSubmitButton);
+  newPasswordInput.addEventListener('input', toggleSubmitButton);
+
+  // Envio do formulário via AJAX
+form.addEventListener('submit', function(event) {
+  event.preventDefault(); // Evita o envio tradicional do formulário
+
+  const currentPassword = currentPasswordInput.value;
+  const newPassword = newPasswordInput.value;
+
+  // Verifica se a nova senha atende a alguns critérios básicos (opcional)
+  if (newPassword.length < 6) {
+    alert('A nova senha deve ter pelo menos 6 caracteres.');
+    return;
+  }
+
+  // Verifica se a nova senha é igual à senha anterior
+  if (currentPassword === newPassword) {
+    alert('A nova senha não pode ser igual à senha anterior.');
+    return;
+  }
+
+  // Enviar os dados para o servidor
+  fetch('/change-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      currentPassword: currentPassword,
+      newPassword: newPassword
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Senha alterada com sucesso.');
+      // Redirecionar ou limpar o formulário
+      form.reset();
+      submitButton.disabled = true;
+    } else {
+      alert('Erro ao alterar a senha: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Erro ao alterar a senha:', error);
+    alert('Erro ao processar a solicitação.');
+  });
+});
+
+const userNameElement = document.getElementById('userName');
+const editIcon = document.getElementById('edit-name');
+
+// Permitir que o usuário edite diretamente o nome
+editIcon.addEventListener('click', function() {
+  userNameElement.focus(); // Colocar o foco no elemento
+});
+
+// Função para atualizar o nome no servidor
+function updateUserName() {
+  const newUserName = userNameElement.innerText.trim(); // Obter o novo nome e remover espaços
+
+  // Enviar o novo nome ao servidor
+  fetch('/update-username', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: newUserName })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Nome atualizado com sucesso.');
+    } else {
+      alert('Erro ao atualizar o nome: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Erro ao atualizar o nome:', error);
+    alert('Erro ao processar a solicitação.');
+  });
+}
+
+// Capturar a saída quando o nome for alterado
+userNameElement.addEventListener('blur', updateUserName);
+
+// Capturar o evento de pressionar uma tecla
+userNameElement.addEventListener('keypress', function(event) {
+  if (event.key === 'Enter') { // Verifica se a tecla pressionada é "Enter"
+    event.preventDefault(); // Impede a quebra de linha
+    userNameElement.blur(); // Simula a perda de foco para disparar a atualização
+  }
+});
+
+
+
 </script> 
 </body>
 </html>

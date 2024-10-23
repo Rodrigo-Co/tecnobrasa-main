@@ -1,6 +1,6 @@
 create database IF NOT EXISTS bancotb;
 use bancotb;
-drop database bancotb;
+-- drop database bancotb;
 create table IF NOT EXISTS usuario(
 idusuario int primary key auto_increment not null,
 nome varchar(70) not null,
@@ -11,10 +11,10 @@ resetPasswordToken VARCHAR(255),
 resetPasswordExpires DATETIME
 );
 select * from usuario;
-select * from usuario where email = 'acerolo'AND senha = '235235';
-truncate table usuario;
+-- select * from usuario where email = 'acerolo'AND senha = '235235';
+-- truncate table usuario;
 
-delete from usuario where idusuario = '1';
+-- delete from usuario where idusuario = '1';
 
 CREATE TABLE IF NOT EXISTS progresso_usuario (
     id INT AUTO_INCREMENT PRIMARY KEY, -- Identificador único para cada registro
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS progresso_usuario (
     FOREIGN KEY (usuarioId) REFERENCES usuario(idusuario) -- Chave estrangeira para a tabela de usuários
 );
 select * from progresso_usuario;
-drop table progresso_usuario;
-delete from progresso_usuario where usuarioId = '1';
-truncate table progresso_usuario;
+-- drop table progresso_usuario;
+-- delete from progresso_usuario where usuarioId = '1';
+-- truncate table progresso_usuario;
 
 CREATE TABLE IF NOT EXISTS videos_assistidos (
     id INT AUTO_INCREMENT PRIMARY KEY, -- Identificador único para cada registro
@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS videos_assistidos (
     FOREIGN KEY (usuarioId) REFERENCES usuario(idusuario), -- Relacionado à tabela de usuários
     INDEX idx_videoId (videoId)
 );
-ALTER TABLE videos_assistidos MODIFY COLUMN videoId VARCHAR(255);
-truncate table videos_assistidos;
+-- ALTER TABLE videos_assistidos MODIFY COLUMN videoId VARCHAR(255);
+-- truncate table videos_assistidos;
 
 CREATE TABLE IF NOT EXISTS favorites (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,6 +61,6 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
     FOREIGN KEY (videoId) REFERENCES videos_assistidos(videoId),
     CONSTRAINT unique_user_course_video UNIQUE (usuarioId, cursoId, videoId)
 );
-drop table avaliacoes;
-truncate table avaliacoes;
+-- drop table avaliacoes;
+-- truncate table avaliacoes;
 select usuarioId, cursoId, videoId, avaliacao from avaliacoes;
