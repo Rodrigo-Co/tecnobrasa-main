@@ -66,7 +66,7 @@
                         Word na Prática
                     </div>
                 </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'word')">⭐ Favoritar</button>
+                <button class="favorite-button" onclick="toggleFavorite(event, this, 'word')">✩</button>
             </a>
 
             <a class="mix excel office" href="/excel.html" data-id="excel">
@@ -76,7 +76,7 @@
                         Excel na Prática
                     </div>
                 </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'excel')">⭐ Favoritar</button>
+                <button class="favorite-button" onclick="toggleFavorite(event, this, 'excel')">✩</button>
             </a>
 
             <a class="mix powerpoint office" href="/ppt.html" data-id="powerpoint">
@@ -86,7 +86,7 @@
                         PowerPoint na Prática
                     </div>
                 </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'powerpoint')">⭐ Favoritar</button>
+                <button class="favorite-button" onclick="toggleFavorite(event, this, 'powerpoint')">✩</button>
             </a>
 
             <a class="mix computadores hardware" href="/computador.html" data-id="computador">
@@ -96,7 +96,7 @@
                         Montagem e Manutenção de Computadores
                     </div>
                 </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'computador')">⭐ Favoritar</button>
+                <button class="favorite-button" onclick="toggleFavorite(event, this, 'computador')">✩</button>
             </a>
 
             <a class="mix git git" href="/git.html" data-id="git">
@@ -106,7 +106,7 @@
                         Conhecendo o GIT
                     </div>
                 </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'git')">⭐ Favoritar</button>
+                <button class="favorite-button" onclick="toggleFavorite(event, this, 'git')">✩</button>
             </a>
 
             <div class="gap"></div>
@@ -181,9 +181,9 @@ function toggleFavorite(event, button, courseId) {
 // Atualiza o estado visual do botão
 function updateFavoriteButton(button, isFavorited) {
     if (isFavorited) {
-        $(button).text('⭐ Desfavoritar');
+        $(button).text('⭐');
     } else {
-        $(button).text('⭐ Favoritar');
+        $(button).text('✩');
     }
 }
 // Carregar favoritos ao iniciar a página
@@ -199,7 +199,7 @@ $(document).ready(function () {
                 // Marca visualmente os itens favoritados
                 favorites.forEach(courseId => {
                     $(`[data-id="${courseId}"]`).addClass('favorite'); // Adiciona a classe .favorite aos itens já favoritados
-                    $(`[data-id="${courseId}"] .favorite-button`).text('⭐ Desfavoritar'); // Atualiza o texto do botão
+                    $(`[data-id="${courseId}"] .favorite-button`).text('⭐'); // Atualiza o texto do botão
                 });
 
                 // Atualiza o filtro de favoritos
