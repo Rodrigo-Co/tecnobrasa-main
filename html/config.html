@@ -242,15 +242,26 @@ form.addEventListener('submit', function(event) {
 
 const userNameElement = document.getElementById('userName');
 const editIcon = document.getElementById('edit-name');
+let previousUserName = userNameElement.innerText;
 
 // Permitir que o usuário edite diretamente o nome
 editIcon.addEventListener('click', function() {
+  previousUserName = userNameElement.innerText;
+  userNameElement.innerText = '';
   userNameElement.focus(); // Colocar o foco no elemento
 });
 
 // Função para atualizar o nome no servidor
 function updateUserName() {
   const newUserName = userNameElement.innerText.trim(); // Obter o novo nome e remover espaços
+
+  // Verificar se o nome não está vazio
+  if (!newUserName) {
+    alert('O nome não pode estar vazio.');
+    userNameElement.innerText = previousUserName;
+    return; // Interrompe a execução da função
+  }
+  
 
   // Enviar o novo nome ao servidor
   fetch('/update-username', {
@@ -264,24 +275,34 @@ function updateUserName() {
   .then(data => {
     if (data.success) {
       alert('Nome atualizado com sucesso.');
+      previousUserName = newUserName;
+      userNameElement.innerText = newUserName;
     } else {
       alert('Erro ao atualizar o nome: ' + data.message);
+      userNameElement.innerText = previousUserName;
     }
   })
   .catch(error => {
     console.error('Erro ao atualizar o nome:', error);
     alert('Erro ao processar a solicitação.');
+    userNameElement.innerText = previousUserName;
   });
 }
 
-// Capturar a saída quando o nome for alterado
-userNameElement.addEventListener('blur', updateUserName);
 
 // Capturar o evento de pressionar uma tecla
 userNameElement.addEventListener('keypress', function(event) {
   if (event.key === 'Enter') { // Verifica se a tecla pressionada é "Enter"
     event.preventDefault(); // Impede a quebra de linha
-    userNameElement.blur(); // Simula a perda de foco para disparar a atualização
+    updateUserName(); 
+    userNameElement.blur();
+  }
+});
+// Capturar o evento de sair do campo sem confirmação (blur)
+userNameElement.addEventListener('blur', function() {
+  const newUserName = userNameElement.innerText.trim();
+  if (newUserName === '' || newUserName != previousUserName) {
+    userNameElement.innerText = previousUserName;
   }
 });
 

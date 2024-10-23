@@ -233,6 +233,6 @@ body::-webkit-scrollbar-thumb:hover {
 }
 #userName:focus {
   outline: none; /* Remove o contorno padrão */
-  border-bottom: 2px solid #007bff; /* Borda azul quando focado */
+  border-bottom: 2px solid #ff9900; /* Borda azul quando focado */
 }
 
