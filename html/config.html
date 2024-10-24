@@ -47,8 +47,13 @@
         </div>
       </div>
       <div>
-        <div class="non-active-form">
-          <p id="userEmail">E-mail do usuário</p>
+        <div class="non-active-form" id="emailForm">
+          <p class="capitalize" id="userEmail" contenteditable="true">E-mail do usuário</p><i id="edit-email" style="cursor: pointer;">✏</i>
+          <div id="passwordSection" style="display: none;">
+            <label for="currentPassword">Confirme sua senha:</label>
+            <input type="password" id="currentPassword" placeholder="Digite sua senha">
+            <button id="confirmEmailChange">Confirmar</button>
+          </div>
         </div>
       </div>
   </div>
@@ -306,7 +311,130 @@ userNameElement.addEventListener('blur', function() {
   }
 });
 
+// Captura os elementos do DOM
+const userEmailElement = document.getElementById('userEmail');
+const userEmailForm = document.getElementById('emailForm');
+const editEmailIcon = document.getElementById('edit-email');
+const passwordSection = document.getElementById('passwordSection');
+const confirmButton = document.getElementById('confirmEmailChange');
+let previousUserEmail = userEmailElement.innerText;
 
+// Permitir que o usuário edite diretamente o e-mail ao clicar no ícone
+editEmailIcon.addEventListener('click', function() {
+  previousUserEmail = userEmailElement.innerText; // Armazena o e-mail anterior
+  userEmailElement.innerText = '';
+  userEmailElement.contentEditable = true; // Permite edição
+  userEmailElement.focus(); // Coloca o foco no campo para editar
+});
+
+// Função para exibir o campo de senha
+function showPasswordSection() {
+  const newEmail = userEmailElement.innerText.trim();
+
+  // Verifica se o e-mail não está vazio e diferente do valor padrão
+  if (newEmail !== previousUserEmail && newEmail !== "") {
+    passwordSection.style.display = 'block'; // Exibe o campo de senha
+    userEmailElement.contentEditable = false; // Desativa a edição do e-mail enquanto a senha é solicitada
+  } else {
+    passwordSection.style.display = 'none'; // Oculta o campo de senha se o e-mail for removido ou restaurado
+    userEmailElement.contentEditable = true; // Permite voltar a editar
+  }
+}
+
+
+
+// Função para atualizar o e-mail no servidor
+function updateUserEmail() {
+  const newUserEmail = userEmailElement.innerText.trim(); // Obter o novo e-mail e remover espaços
+  const currentPassword = document.getElementById('currentPassword').value.trim(); // Obter a senha do campo
+
+  // Validação do e-mail (regex básico)
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!newUserEmail || !emailPattern.test(newUserEmail)) {
+    alert('Por favor, insira um e-mail válido.');
+    userEmailElement.innerText = previousUserEmail;
+    return; // Interrompe a execução da função
+  }
+
+  if (!newUserEmail) {
+    alert('O email não pode estar vazio.');
+    userEmailElement.innerText = previousUserEmail;
+    return; // Interrompe a execução da função
+  }
+
+  // Verificar se a senha foi preenchida
+  if (!currentPassword) {
+    alert('Por favor, insira sua senha para confirmar.');
+    return;
+  }
+
+  // Enviar o novo e-mail ao servidor
+  fetch('/change-email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ 
+      newEmail: newUserEmail,
+      currentPassword: currentPassword
+     })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('E-mail atualizado com sucesso.');
+      previousUserEmail = newUserEmail;
+      passwordSection.style.display = 'none';
+    } else {
+      alert('Erro ao atualizar o e-mail: ' + data.message);
+      userEmailElement.innerText = previousUserEmail;
+    }
+  })
+  .catch(error => {
+    console.error('Erro ao atualizar o e-mail:', error);
+    alert('Erro ao processar a solicitação.');
+    userEmailElement.innerText = previousUserEmail;
+  });
+}
+
+// Capturar o evento de pressionar "Enter"
+userEmailElement.addEventListener('keypress', function(event) {
+  if (event.key === 'Enter') { // Verifica se a tecla pressionada é "Enter"
+    event.preventDefault(); // Impede a quebra de linha
+
+    // Valida o novo e-mail antes de exibir a seção de senha
+    const newEmail = userEmailElement.innerText.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (newEmail && emailPattern.test(newEmail)) {
+      passwordSection.style.display = 'block'; // Exibe o campo de senha
+      userEmailElement.contentEditable = false; // Desativa a edição do e-mail
+      document.getElementById('currentPassword').focus(); // Foca no campo de senha
+    } else {
+      alert('Por favor, insira um e-mail válido antes de continuar.');
+      userEmailElement.innerText = previousUserEmail; // Restaura o e-mail anterior
+    }
+  }
+});
+
+// Capturar o evento de clicar no botão de confirmar a alteração
+confirmButton.addEventListener('click', function() {
+  updateUserEmail(); // Chama a função de atualização ao clicar em "Confirmar"
+});
+
+// Capturar o evento de sair do campo (blur) sem confirmação
+userEmailForm.addEventListener('blur', function() {
+  const newUserEmail = userEmailElement.innerText.trim();
+  
+  // Se o e-mail não foi alterado ou ficou vazio, restaura o valor anterior
+  if (newUserEmail === '' || newUserEmail != previousUserEmail) {
+    userEmailElement.innerText = previousUserEmail;
+  }
+  if (passwordSection.style.display === 'none' && (newUserEmail != previousUserEmail || newUserEmail === '')) {
+    userEmailElement.innerText = previousUserEmail;
+    userEmailElement.contentEditable = true; // Reativa a edição
+  }
+});
 
 </script> 
 </body>

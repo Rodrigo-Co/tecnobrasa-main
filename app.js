@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'rodrigo', // Substitua pela sua senha do MySQL
+    password: 'cimatec', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -301,6 +301,52 @@ app.post('/change-password', (req, res) => {
       });
     });
   });
+
+  app.post('/change-email', (req, res) => {
+    const { newEmail, currentPassword } = req.body;
+    const userId = req.session.usuario.idusuario; // Supondo que o ID do usuário esteja na sessão
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Usuário não autenticado.' });
+    }
+
+    if (!newEmail || !currentPassword) {
+      return res.status(400).json({ success: false, message: 'Preencha todos os campos.' });
+    }
+
+    // Consulta ao banco de dados para pegar a senha atual do usuário
+    const query = 'SELECT senha FROM usuario WHERE idusuario = ?';
+    db.query(query, [userId], async (err, results) => {
+      if (err) {
+        console.error('Erro ao consultar o banco de dados:', err);
+        return res.status(500).json({ success: false, message: 'Erro ao buscar a senha do usuário.' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+      }
+
+      const storedPasswordHash = results[0].senha;
+
+      // Verificar se a senha atual está correta
+      const passwordMatch = await bcrypt.compare(currentPassword, storedPasswordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({ success: false, message: 'Senha incorreta.' });
+      }
+
+      // Atualizar o novo e-mail no banco de dados
+      const updateQuery = 'UPDATE usuario SET email = ? WHERE idusuario = ?';
+      db.query(updateQuery, [newEmail, userId], (err, result) => {
+        if (err) {
+          console.error('Erro ao atualizar o e-mail no banco de dados:', err);
+          return res.status(500).json({ success: false, message: 'Erro ao atualizar o e-mail.' });
+        }
+
+        res.json({ success: true, message: 'E-mail alterado com sucesso.' });
+      });
+    });
+});
+
 
 // Servir arquivos estáticos (CSS, imagens, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -671,6 +717,8 @@ app.get('/getData', (req, res) => {
         });
     });
 });
+
+
 
 app.post('/update-username', (req, res) => {
     const newUserName = req.body.name;

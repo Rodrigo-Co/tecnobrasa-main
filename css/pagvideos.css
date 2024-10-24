@@ -131,6 +131,10 @@
   height: 10px;
   z-index: 1100;
 }
+#linha2 h2{
+  position: fixed;
+  left: 9px;
+}
   /* Estilo para o botão de menu toggle */
   #menu-toggle {
     cursor: pointer;

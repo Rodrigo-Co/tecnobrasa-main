@@ -231,8 +231,11 @@ body::-webkit-scrollbar-thumb:hover {
   border: 10px;
   color: aliceblue;
 }
-#userName:focus {
+#userName:focus{
   outline: none; /* Remove o contorno padrão */
   border-bottom: 2px solid #ff9900; /* Borda azul quando focado */
 }
-
+#userEmail:focus{
+  outline: none;
+  border-bottom: 2px solid #ff9900;
+}
