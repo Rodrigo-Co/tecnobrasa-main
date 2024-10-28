@@ -124,7 +124,7 @@
   z-index: 1100;
 }
 #linha2 {
-  margin-top: 400px !important;
+  margin-top: 425px !important;
   position: fixed;
   background-color: #e69500;
   width: 250px;
@@ -133,7 +133,7 @@
 }
 #linha2 h2{
   position: fixed;
-  left: 9px;
+  left: 7px;
 }
   /* Estilo para o botão de menu toggle */
   #menu-toggle {
