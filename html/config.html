@@ -52,7 +52,7 @@
           <div id="passwordSection" style="display: none;">
             <label for="currentPassword">Confirme sua senha:</label>
             <input type="password" id="currentPassword" placeholder="Digite sua senha">
-            <button id="confirmEmailChange">Confirmar</button>
+            <button style="cursor: pointer;" id="confirmEmailChange">Confirmar</button>
           </div>
         </div>
       </div>
@@ -422,18 +422,16 @@ confirmButton.addEventListener('click', function() {
   updateUserEmail(); // Chama a função de atualização ao clicar em "Confirmar"
 });
 
-// Capturar o evento de sair do campo (blur) sem confirmação
-userEmailForm.addEventListener('blur', function() {
+
+// Capturar o evento de sair do campo (blur) do userEmailElement
+userEmailElement.addEventListener('blur', function() {
   const newUserEmail = userEmailElement.innerText.trim();
-  
-  // Se o e-mail não foi alterado ou ficou vazio, restaura o valor anterior
-  if (newUserEmail === '' || newUserEmail != previousUserEmail) {
-    userEmailElement.innerText = previousUserEmail;
-  }
-  if (passwordSection.style.display === 'none' && (newUserEmail != previousUserEmail || newUserEmail === '')) {
-    userEmailElement.innerText = previousUserEmail;
-    userEmailElement.contentEditable = true; // Reativa a edição
-  }
+
+  // Verifica se o campo de e-mail está vazio ou não mudou
+  if (newUserEmail === '' || newUserEmail === previousUserEmail) {
+    userEmailElement.innerText = previousUserEmail; // Restaura o e-mail anterior
+    userEmailElement.contentEditable = false; // Desativa a edição
+  } 
 });
 
 </script> 
