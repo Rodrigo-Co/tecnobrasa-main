@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/pagaluno.css">
+    <title>CERTIFICADOS</title>
+</head>
+<body>
+
+    <div id="sidebar" class="sidebar">
+        <!-- Conteúdo da barra lateral -->
+        
+        <div id="infouser">
+            <div id="imguser">
+              <img src="../uploads/default-profile.png" id="imguserelement"> <!-- Coloque uma imagem padrão -->
+            </div>
+            <h2 id="nomeusuario">Usuario</h2>
+        </div>
+
+        <div id="linha">
+        </div>
+        <ul>
+            <li><a href="/pagaluno.html">Cursos</a></li>
+            <li><a href="https://www.mapadaprova.com.br/questoes/informatica-basica/office-365"
+                    target="_blank">Questões</a></li>
+                    <li><a href="/certificado.html">Certificados</a></li>
+            <li><a href="/config.html">Configurações</a></li>
+
+            <li><a href="/indexInicio.html">Sair</a></li>
+        </ul>
+        <div id="linha2">
+
+            <h2>TECNOBRASA</h2>
+        </div>
+    </div>
+
+    <div id="content">
+        <div id="boxmenu">
+            <img src="/barras.png" id="menu-toggle">
+            <h2>Meus Cursos</h2>
+        </div>
+
+        <div class="certificate-content">
+            <h3>Selecione o curso para emissão do certificado:</h3>
+            <form id="certificadoForm">
+                <select id="cursoSelecionado" name="curso">
+                    <option value="1">Word na Prática</option>
+                    <option value="2">Excel na Prática</option>
+                    <option value="3">PowerPoint na Prática</option>
+                    <option value="4">Montagem e Manutenção de Computadores</option>
+                    <option value="5">Conhecendo o GIT</option>
+                </select>
+                <button type="submit" id="emitirCertificado">Emitir Certificado</button>
+            </form>
+            <div id="certificadoMensagem"></div>
+            <!-- Campo para digitar o nome completo antes de emitir o certificado -->
+        <div id="nomeCompletoSection" style="display: none;">
+            <h4>Digite seu nome completo para emissão do certificado:</h4>
+            <input type="text" id="nomeCompleto" placeholder="Nome completo" required>
+            <button id="confirmarCertificado">Confirmar e Emitir Certificado</button>
+        </div>
+        </div>
+       
+    </div>
+    <!-- partial -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js'></script>
+    <script>
+        let usuarioId;
+         
+        $('#menu-toggle').on('click', function () {
+            // Alterna a classe 'active' no elemento #sidebar
+            $('#sidebar').toggleClass('active');
+
+            // Alterna a classe 'shifted' no elemento #content
+            $('#content').toggleClass('shifted');
+        });
+
+
+        $(document).ready(function () {
+            
+
+            $('#certificadoForm').on('submit', function (event) {
+                event.preventDefault();
+                const cursoId = $('#cursoSelecionado').val();
+
+                // Verifica se o curso foi concluído antes de emitir o certificado
+                $.ajax({
+                    url: '/user/checkCompletion',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ usuarioId, cursoId }),
+                    success: function (response) {
+                        if (response.success && response.isCompleted) {
+                            // Exibe o campo para digitar o nome completo
+                            $('#nomeCompletoSection').show();
+                            $('#certificadoMensagem').text('');
+                            
+                            // Atribui o cursoId à função de emissão para que seja reutilizado
+                            $('#confirmarCertificado').off('click').on('click', function () {
+                                const nomeCompleto = $('#nomeCompleto').val();
+                                if (nomeCompleto) {
+                                    emitirCertificado(cursoId, nomeCompleto);
+                                } else {
+                                    $('#certificadoMensagem').text('Por favor, digite seu nome completo.');
+                                }
+                            });
+                        } else {
+                            $('#certificadoMensagem').text('Você precisa concluir o curso antes de emitir o certificado.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro na requisição:', error);
+                        $('#certificadoMensagem').text('Erro ao verificar a conclusão do curso.');
+                    }
+                });
+            });
+            function emitirCertificado(cursoId, nomeCompleto) {
+                $.ajax({
+                    url: '/user/certificado',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ usuarioId, cursoId, nomeCompleto, userEmail }),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#certificadoMensagem').html(`<p>Informações sobre o Certificado enviado para o e-mail!</p>`);
+                            $('#nomeCompletoSection').hide();
+                        } else {
+                            $('#certificadoMensagem').text('Erro ao emitir o certificado: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro na requisição:', error);
+                        $('#certificadoMensagem').text('Erro ao emitir o certificado.');
+                    }
+                });
+            }
+        });
+        let userEmail;
+        window.onload = function() {
+            obterUsuarioId();
+    fetch('/getData')
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Erro:', data.error);
+        } else {
+          // Armazena o email em uma variável global
+          userEmail = data.email;
+        }
+    })
+      .catch(error => {
+        console.error('Erro ao buscar os dados do usuário:', error);
+      });
+    };
+        
+        function obterUsuarioId() {
+        return $.ajax({
+        url: '/getUsuarioId',
+        method: 'GET',
+        success: function(response) {
+            if (response.usuarioId) {
+                usuarioId = response.usuarioId; // Armazenar o ID do usuário na variável global
+                //console.log('ID do usuário:', usuarioId);  Para verificar se o ID foi obtido
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erro ao buscar ID do usuário:', error);
+        }
+    });
+} ;
+
+    </script>
+</body>
+</html>

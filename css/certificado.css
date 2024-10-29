@@ -1,0 +1,37 @@
+#boxmenu {
+    width: 100%;
+    height: 100px;
+    background-color: rgb(1, 150, 177);
+    box-shadow: 0px 10px #e69500;
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+    /* Remove margens indesejadas */
+    padding: 0;
+    /* Remove preenchimento */
+  
+  }
+  
+  #boxmenu img {
+    position: absolute;
+    width: 50px;
+    margin-left: 10px;
+    margin-top: 7px;
+    display: inline-block;
+    vertical-align: middle;
+    z-index: 1100;
+  }
+  
+  #boxmenu h2 {
+    position: absolute;
+    font-family: Arial;
+    font-size: 25px;
+    font-style: normal;
+    margin-left: 150px;
+    /* Ajuste a margem esquerda para 70px */
+    margin-top: 35px;
+    display: inline-block;
+    vertical-align: middle;
+  
+  }

@@ -139,6 +139,33 @@ const transporter = nodemailer.createTransport({
     }
   });
 
+  // Rota para emitir o certificado e enviar o email de notificação
+app.post('/user/certificado', (req, res) => {
+    const { usuarioId, cursoId, nomeCompleto, userEmail } = req.body;
+
+    const mailOptions = {
+        from: 'ttecnobrasa@gmail.com', // Email do remetente
+        to: userEmail, // Email do destinatário (do usuário)
+        subject: 'Certificado Emitido com Sucesso',
+        text: `Olá, ${nomeCompleto}! 
+
+Parabéns por concluir o curso "${cursoId}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.
+
+Atenciosamente,
+Equipe TecnoBrasa`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Erro ao enviar email:', error);
+            return res.status(500).json({ success: false, message: 'Erro ao enviar o email de certificado' });
+        } else {
+            console.log('Email enviado:', info.response);
+            return res.status(200).json({ success: true, message: 'Certificado emitido e email enviado com sucesso' });
+        }
+    });
+});
+
  // Rota para enviar o token de redefinição de senha
 app.post('/send-password-reset', (req, res) => {
     const { email } = req.body;
@@ -597,6 +624,46 @@ app.get('/getProgresso', (req, res) => {
         }
     });
 });
+
+// Rota para verificar se o usuário concluiu o curso
+app.post('/user/checkCompletion', (req, res) => {
+    const { usuarioId, cursoId } = req.body;
+
+    // Verificar se os parâmetros foram fornecidos
+    if (!usuarioId || !cursoId) {
+        return res.status(400).json({ message: 'ID do usuário ou do curso não fornecido.' });
+    }
+
+    // Consulta para buscar o progresso do curso no banco de dados
+    const query = `
+        SELECT pu.progresso
+        FROM progresso_usuario pu
+        WHERE pu.usuarioId = ? AND pu.cursoId = ?
+    `;
+    
+    db.query(query, [usuarioId, cursoId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erro ao verificar a conclusão do curso.' });
+        }
+
+        if (results.length > 0) {
+            const progresso = results[0].progresso;
+
+            // Verificar se o progresso do curso é de 100%
+            if (progresso >= 100) {
+                return res.json({ success: true, isCompleted: true });
+            } else {
+                return res.json({ success: true, isCompleted: false });
+            }
+        } else {
+            // Se não houver progresso salvo, retornar que o curso não foi concluído
+            res.json({ success: true, isCompleted: false });
+        }
+    });
+});
+
+
 // POST: Adicionar ou remover curso dos favoritos (usando callbacks)
 app.post('/user/favorite', (req, res) => {
     const userId = req.session.usuario.idusuario; // ID do usuário logado
