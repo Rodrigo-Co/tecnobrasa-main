@@ -11,7 +11,7 @@ const multer = require('multer');
 const fs = require('fs'); 
 
 const app = express();
-const port = process.env.PORT || 3300;
+const PORT = process.env.PORT || 3300;
 
 // Verifica se o diretório 'uploads' existe e, se não existir, cria.
 const uploadDir = path.join(__dirname, 'uploads');
@@ -862,6 +862,6 @@ app.delete('/delete/:idusuario', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
