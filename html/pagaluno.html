@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CURSOS</title>
     <link rel="stylesheet" href="/pagaluno.css">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu&amp;display=swap'><link rel="stylesheet" href="/cursos.css">
+
 </head>
 
 <body>
@@ -63,6 +67,65 @@
 
         <div id="Container" class="container">
 
+            <div class="container mt-5">
+                <div class="row">
+                
+                <div class="col-md-4 mb-3 mb-md-0">
+                <div class="card h-100">
+                <div class="labels">
+                </div>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="Curso Online">
+                <div class="card-body position-relative d-flex flex-column">
+                <h4>Word na prática</h4>
+                <p style="color: black; display: block;">Aprendendo Word na prática.</p>
+                <div class="button-container">
+                    <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Assistir aula
+                    </a>
+                    <button class="favorite-button" onclick="toggleFavorite(event, this, 'word')">✩</button>
+                </div>
+                </div>
+                </div>
+            </div>
+                   
+                <div class="col-md-4 mb-3 mb-md-0">
+                <div class="card h-100">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="">
+                <div class="card-body position-relative d-flex flex-column">
+                <h4>Excel na prática</h4>
+                <p style="color: black; display: block;">Aprendendo Excel na prática.</p>
+                <div class="button-container">
+                    <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Assistir aula
+                    </a>
+                    <button class="favorite-button" onclick="toggleFavorite(event, this, 'excel')">✩</button>
+                </div>
+                </div>
+                </div>
+            </div>
+                    
+                <div class="col-md-4 mb-3 mb-md-0">
+                <div class="card h-100">
+                <div class="labels"></div>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="Curso Online">
+                <div class="card-body position-relative d-flex flex-column">
+                <h5>PowerPoint na prática</h5>
+                <p style="color: black; display: block;">Aprendendo PT na prática.</p>
+                <div class="button-container">
+                    <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Assistir aula
+                    </a>
+                    <button class="favorite-button" onclick="toggleFavorite(event, this, 'powerpoint')">✩</button>
+                </div>
+                </div>
+                </div>
+            </div>
+                
+        </div>
+
             <a class="mix word office" href="/word.html" data-id="word">
                 <img class="image" src="/microsoft-word.png">
                 <div class="overlay">
@@ -115,9 +178,15 @@
 
             <div class="gap"></div>
             <div class="gap"></div>
+
+
+
         </div>
     </div>
     <!-- partial -->
+    <script src='https://code.jquery.com/jquery-3.2.1.slim.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js'></script><script  src="/cursos.js"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src='https://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js'></script>
     <script>

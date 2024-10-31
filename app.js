@@ -143,13 +143,26 @@ const transporter = nodemailer.createTransport({
 app.post('/user/certificado', (req, res) => {
     const { usuarioId, cursoId, nomeCompleto, userEmail } = req.body;
 
+    const cursos = {
+        1: "Word na Prática",
+        2: "Excel na Prática",
+        3: "PowerPoint na Prática",
+        4: "Montagem e Manutenção de Computadores",
+        5: "Conhecendo o GIT"
+    };
+
+    const nomeCurso = cursos[cursoId];
+    if (!nomeCurso) {
+        return res.status(400).json({ success: false, message: 'Curso não encontrado' });
+    }
+
     const mailOptions = {
         from: 'ttecnobrasa@gmail.com', // Email do remetente
         to: userEmail, // Email do destinatário (do usuário)
         subject: 'Certificado Emitido com Sucesso',
         text: `Olá, ${nomeCompleto}! 
 
-Parabéns por concluir o curso "${cursoId}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.
+Parabéns por concluir o curso "${nomeCurso}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.
 
 Atenciosamente,
 Equipe TecnoBrasa`

@@ -10,7 +10,6 @@ profileImage VARCHAR(255),
 resetPasswordToken VARCHAR(255),
 resetPasswordExpires DATETIME
 );
-select * from usuario;
 -- select * from usuario where email = 'acerolo'AND senha = '235235';
 -- truncate table usuario;
 
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS progresso_usuario (
     progresso DECIMAL(5, 2) DEFAULT 0, -- Porcentagem de progresso
     FOREIGN KEY (usuarioId) REFERENCES usuario(idusuario) -- Chave estrangeira para a tabela de usuários
 );
-select * from progresso_usuario;
+-- select * from progresso_usuario;
 -- drop table progresso_usuario;
 -- delete from progresso_usuario where usuarioId = '1';
 -- truncate table progresso_usuario;
@@ -48,7 +47,7 @@ CREATE TABLE IF NOT EXISTS favorites (
     FOREIGN KEY (usuario_id) REFERENCES usuario(idusuario),
     UNIQUE(usuario_id, curso_id) -- Evita duplicatas
 );
-select * from favorites;
+-- select * from favorites;
 
 CREATE TABLE IF NOT EXISTS avaliacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,4 +62,4 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
 );
 -- drop table avaliacoes;
 -- truncate table avaliacoes;
-select usuarioId, cursoId, videoId, avaliacao from avaliacoes;
+-- select usuarioId, cursoId, videoId, avaliacao from avaliacoes;

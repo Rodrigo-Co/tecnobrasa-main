@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/pagaluno.css">
+    <link rel="stylesheet" href="/certificado.css">
     <title>CERTIFICADOS</title>
 </head>
 <body>
@@ -58,7 +59,7 @@
         <div id="nomeCompletoSection" style="display: none;">
             <h4>Digite seu nome completo para emissão do certificado:</h4>
             <input type="text" id="nomeCompleto" placeholder="Nome completo" required>
-            <button id="confirmarCertificado">Confirmar e Emitir Certificado</button>
+            <button id="confirmarCertificado">Confirmar</button>
         </div>
         </div>
        
@@ -79,43 +80,49 @@
 
 
         $(document).ready(function () {
-            
+    let certificadoEmitido = false; // Flag para verificar se o certificado já foi emitido
 
-            $('#certificadoForm').on('submit', function (event) {
-                event.preventDefault();
-                const cursoId = $('#cursoSelecionado').val();
+    $('#certificadoForm').on('submit', function (event) {
+        event.preventDefault();
+        
+        if (certificadoEmitido) {
+            $('#certificadoMensagem').text('Certificado já emitido para este curso.');
+            return; // Para o processo de emissão se já tiver sido emitido
+        }
 
-                // Verifica se o curso foi concluído antes de emitir o certificado
-                $.ajax({
-                    url: '/user/checkCompletion',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ usuarioId, cursoId }),
-                    success: function (response) {
-                        if (response.success && response.isCompleted) {
-                            // Exibe o campo para digitar o nome completo
-                            $('#nomeCompletoSection').show();
-                            $('#certificadoMensagem').text('');
-                            
-                            // Atribui o cursoId à função de emissão para que seja reutilizado
-                            $('#confirmarCertificado').off('click').on('click', function () {
-                                const nomeCompleto = $('#nomeCompleto').val();
-                                if (nomeCompleto) {
-                                    emitirCertificado(cursoId, nomeCompleto);
-                                } else {
-                                    $('#certificadoMensagem').text('Por favor, digite seu nome completo.');
-                                }
-                            });
+        const cursoId = $('#cursoSelecionado').val();
+
+        // Verifica se o curso foi concluído antes de emitir o certificado
+        $.ajax({
+            url: '/user/checkCompletion',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ usuarioId, cursoId }),
+            success: function (response) {
+                if (response.success && response.isCompleted) {
+                    $('#nomeCompletoSection').show();
+                    $('#certificadoMensagem').text('');
+
+                    $('#confirmarCertificado').off('click').on('click', function () {
+                        const nomeCompleto = $('#nomeCompleto').val();
+                        if (nomeCompleto) {
+                            emitirCertificado(cursoId, nomeCompleto);
+                            certificadoEmitido = true; // Define a flag para evitar nova emissão
                         } else {
-                            $('#certificadoMensagem').text('Você precisa concluir o curso antes de emitir o certificado.');
+                            $('#certificadoMensagem').text('Por favor, digite seu nome completo.');
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Erro na requisição:', error);
-                        $('#certificadoMensagem').text('Erro ao verificar a conclusão do curso.');
-                    }
-                });
-            });
+                    });
+                } else {
+                    $('#certificadoMensagem').text('Você precisa concluir o curso antes de emitir o certificado.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro na requisição:', error);
+                $('#certificadoMensagem').text('Erro ao verificar a conclusão do curso.');
+            }
+        });
+    });
+
             function emitirCertificado(cursoId, nomeCompleto) {
                 $.ajax({
                     url: '/user/certificado',
@@ -171,6 +178,27 @@
     });
 } ;
 
+// Quando o documento estiver pronto, faça a requisição para obter os dados do usuário logado
+$(document).ready(function() {
+        $.ajax({
+            url: '/user/profile', // URL da rota no backend
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    // Atualiza o nome do usuário
+                    $('#nomeusuario').text(response.nome);
+
+                    // Atualiza a imagem do usuário
+                    $('#imguserelement').attr('src', response.profileImage);
+                } else {
+                    console.error('Erro ao carregar informações do usuário:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro na requisição:', error);
+            }
+        });
+    });
     </script>
 </body>
 </html>

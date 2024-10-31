@@ -1,0 +1,115 @@
+a {
+  transition: 0.3s;
+}
+p {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 10px;
+  margin-top: 10px;
+
+}
+
+.card {
+  overflow: hidden;
+  box-shadow: 0 3px 17px rgba(0, 0, 0, 0.15), 0 0 5px rgba(0, 0, 0, 0.15);
+}
+.card img {
+  width: 100%;
+  height: auto !important;
+}
+
+.add-to-cart {
+  display: block;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 1.3rem;
+  line-height: 59px;
+  position: absolute;
+  right: 1.25rem;
+  top: -30px;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
+}
+.add-to-cart:hover {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0.8;
+}
+.labels > div {
+  width: 150px;
+  position: absolute;
+}
+.labels > div.label-new {
+  left: -40px;
+  top: 20px;
+  transform: rotate(-45deg);
+}
+.labels > div.label-sale {
+  right: -40px;
+  top: 20px;
+  transform: rotate(45deg);
+}
+
+.btn-default {
+  background-color: #F04F26;
+  color: #FFF;
+  border-color: #F04F26;
+  padding: 10px 10px 10px 1px;
+  
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+  background-color: #FDB913;
+  color: #FFF;
+  border-color: #FDB913;
+}
+
+.preco-curso {
+  color: #F04F26;
+}
+
+.avaliacao-curso {
+  color: #F04F26;
+}
+
+.bg-custom-1 {
+  background-color: #F04F26;
+}
+
+.bg-custom-2 {
+  background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+}
+
+.main-page {
+  margin-top: 1rem;
+}
+.button-container {
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaçamento entre os botões */
+}
+
+.button-container .btn {
+  flex-grow: 1; /* Faz o botão "Assistir aula" ocupar o máximo de espaço possível */
+}
+
+.favorite-button {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffcc00; /* Cor do botão favorito */
+}
+
+.favorite-button:hover {
+  color: #ff9900; /* Cor ao passar o mouse */
+}
