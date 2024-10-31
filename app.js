@@ -11,7 +11,7 @@ const multer = require('multer');
 const fs = require('fs'); 
 
 const app = express();
-const port = 3300;
+const PORT = process.env.PORT || 3300;
 
 // Verifica se o diretório 'uploads' existe e, se não existir, cria.
 const uploadDir = path.join(__dirname, 'uploads');
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -140,19 +140,26 @@ const transporter = nodemailer.createTransport({
   });
 
   // Rota para emitir o certificado e enviar o email de notificação
-app.post('/user/certificado', (req, res) => {
+  app.post('/user/certificado', (req, res) => {
     const { usuarioId, cursoId, nomeCompleto, userEmail } = req.body;
+
+    // Mapeamento dos IDs dos cursos para os nomes correspondentes
+    const cursos = {
+        1: 'Word',
+        2: 'Excel',
+        3: 'PowerPoint',
+        4: 'Montagem e Manutenção de Computadores',
+        5: 'Git'
+    };
+
+    // Obter o nome do curso usando o ID do curso
+    const nomeCurso = cursos[cursoId] || 'Curso desconhecido';
 
     const mailOptions = {
         from: 'ttecnobrasa@gmail.com', // Email do remetente
         to: userEmail, // Email do destinatário (do usuário)
         subject: 'Certificado Emitido com Sucesso',
-        text: `Olá, ${nomeCompleto}! 
-
-Parabéns por concluir o curso "${cursoId}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.
-
-Atenciosamente,
-Equipe TecnoBrasa`
+        text: `Olá, ${nomeCompleto}!\n\nParabéns por concluir o curso "${nomeCurso}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.\n\nAtenciosamente,\nEquipe TecnoBrasa`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -855,6 +862,6 @@ app.delete('/delete/:idusuario', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
