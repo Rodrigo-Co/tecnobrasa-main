@@ -122,6 +122,12 @@
             }
         });
     });
+    // Oculta o campo de nome completo ao selecionar um novo curso
+    $('#cursoSelecionado').on('change', function () {
+        $('#nomeCompletoSection').hide(); // Oculta o campo de nome completo
+        $('#nomeCompleto').val(''); // Limpa o valor do campo de nome completo
+        $('#certificadoMensagem').text(''); // Limpa a mensagem de status
+    });
 
             function emitirCertificado(cursoId, nomeCompleto) {
                 $.ajax({
