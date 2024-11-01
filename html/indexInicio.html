@@ -139,9 +139,9 @@
                 Cursos
               </a>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" tabindex="-1" aria-disabled="true">Pacote Office</a></li>
-                <li><a class="dropdown-item" tabindex="-1" aria-disabled="true">Montagem e Manutenção de Computadores</a></li>
-                <li><a class="dropdown-item" tabindex="-1" aria-disabled="true">Git</a></li>
+                <li><a class="dropdown-item" aria-disabled="true" onclick= "document.getElementById('cursos').scrollIntoView({ behavior: 'smooth' });">Pacote Office</a></li>
+                <li><a class="dropdown-item" aria-disabled="true" onclick= "document.getElementById('cursos').scrollIntoView({ behavior: 'smooth' });">Montagem e Manutenção de Computadores</a></li>
+                <li><a class="dropdown-item" aria-disabled="true"onclick= "document.getElementById('cursos').scrollIntoView({ behavior: 'smooth' });">Git</a></li>
               </ul>
             </li>
             <li class="nav-item">
@@ -153,7 +153,7 @@
     </div>
   </nav>
 
-  <div id="carouselExampleCaptions" class="carousel slide">
+  <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-indicators"> 
       <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" aria-label="Slide 1" class="active" aria-current="true"></button>
       <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" class="" aria-label="Slide 2"></button>
@@ -226,9 +226,10 @@
     <div class="container">
 
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-        <div class="col">
+        <div id="cursos" class="col">
+          <a href="/indexCadastro.html" onclick="openWithFade(event)" style="text-decoration: none;">
           <div class="card shadow-sm">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excel.png" width="100%" height="100%" /></svg>
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excelinicio.jpg" width="100%" height="100%" x="0" preserveAspectRatio="xMinYMid slice" /></svg>
             <div class="card-body">
               <p class="card-text">Aprenda a montar uma planilha personalizada, com fórmulas,funções e gráficos!</p>
               <div class="d-flex justify-content-between align-items-center">
@@ -236,51 +237,58 @@
               </div>
             </div>
           </div>
+        </a>
         </div>
         <div class="col">
+          <a href="/indexCadastro.html" onclick="openWithFade(event)" style="text-decoration: none;">
           <div class="card shadow-sm">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excel.png" width="100%" height="100%" /></svg>
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-power-pointinicio.jpg" width="100%" height="89%" x="-30" transform = "scale(1.15)"/></svg>
             <div class="card-body">
               <p class="card-text">Com esse curso, você vai praticar a criação/edição e exibição de apresentações gráficas!</p>
-              <div class="d-flex justify-content-between align-items-center">
-                
+              <div class="d-flex justify-content-between align-items-center"> 
               </div>
             </div>
           </div>
+        </a>
         </div>
         <div class="col">
+          <a href="/indexCadastro.html" onclick="openWithFade(event)" style="text-decoration: none;">
           <div class="card shadow-sm">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excel.png" width="100%" height="100%" /></svg>
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-wordinicio.jpg" width="100%" height="100%" x="0" preserveAspectRatio="xMinYMid slice" /></svg>
+            <div class="card-body">
+              <p class="card-text">Criado para ajudar você a criar, organizar e redigir documentos de qualidade profissional!</p>
+              <div class="d-flex justify-content-between align-items-center">  
+              </div>
+            </div>
+          </div>
+        </a>
+        </div>
+        <div class="col">
+          <a href="/indexCadastro.html" onclick="openWithFade(event)" style="text-decoration: none;">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/gitinicio.jpeg" width="100%" height="100%" x="0" preserveAspectRatio="xMinYMid slice" /></svg>
             <div class="card-body">
               <p class="card-text">Este curso apresenta sobre a instalação, configuração e manuseio da plataforma Git!</p>
-              <div class="d-flex justify-content-between align-items-center">
-                
+              <div class="d-flex justify-content-between align-items-center">  
               </div>
             </div>
           </div>
-        </div>
-        <div class="col">
-          <div class="card shadow-sm">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excel.png" width="100%" height="100%" /></svg>
-            <div class="card-body">
-              <p class="card-text">Projetado para ajudar você a criar documentos de qualidade profissional pode ajudá-lo a organizar e redigir documentos de maneira mais eficaz!</p>
-              <div class="d-flex justify-content-between align-items-center">
-                
-              </div>
-            </div>
-          </div>
+        </a>
         </div>
 
         <div class="col">
+          <a href="/indexCadastro.html" onclick="openWithFade(event)" style="text-decoration: none;">
+          
           <div class="card shadow-sm">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/microsoft-excel.png" width="100%" height="100%" /></svg>
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" role="img" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><image href="/computador-desenho.jpg" width="100%" height="100%" x="0" preserveAspectRatio="xMinYMid slice" /></svg>
             <div class="card-body">
-              <p class="card-text">Este curso apresenta informações sobre a montagem, configuração e manutenção de hardware de computadores, para Você conhecer sua máquina de ponta a ponta!</p>
+              <p class="card-text">Este curso apresenta informações sobre a montagem e manutenção de hardware de computadores!</p>
               <div class="d-flex justify-content-between align-items-center">
                 
               </div>
             </div>
           </div>
+        </a>
         </div>
 
 </main>
@@ -303,5 +311,21 @@
       </footer>
     </div>
 <script src="/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  window.onload = function() {
+    document.body.classList.remove('fade-out');
+};
+  function openWithFade(event) {
+    event.preventDefault();  // Previne o redirecionamento imediato
+    document.body.classList.add('fade-out');  // Adiciona a classe de saída
+
+    setTimeout(() => {
+        window.location.href = "/indexCadastro.html";  // Redireciona após o fade
+    }, 500);  // Tempo do redirecionamento em milissegundos (0.5s para coincidir com o CSS)
+    setTimeout(() => {
+        document.body.classList.remove('fade-out');
+    }, 1000);
+  }
+</script>
     </body>
 </html>
