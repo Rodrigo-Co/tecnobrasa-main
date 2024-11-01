@@ -295,7 +295,6 @@ body {
   z-index: 10; /* Garante que fique acima de outros elementos */
 }
 
-
 #overlay {
 display: none; /* Inicialmente escondido */
 position: fixed;
@@ -325,11 +324,11 @@ align-items: center;
   background-color: #ffae00; /* Cor de fundo */
   color: white; /* Cor do texto */
   border: none; /* Sem borda */
-  padding: 10px 20px; /* Espaçamento interno */
+  padding: 15px 30px; /* Espaçamento interno */
   border-radius: 25px; /* Cantos arredondados */
   position: fixed; /* Para posicionar o pseudo-elemento */
   cursor: pointer; /* Mão ao passar o mouse */
-  font-size: 16px; /* Tamanho da fonte */
+  font-size: 18px; /* Tamanho da fonte */
   right: 40px;
   bottom: 30px;
 }
@@ -337,23 +336,27 @@ align-items: center;
 #openBtn::after {
   content: '';
   position: absolute;
-  bottom: 100%; /* Acima do botão */
-  left: 90%; /* Centralizado */
-  margin-left: -10px; /* Para centralizar o triângulo */
-  border-width: 10px; /* Tamanho do triângulo */
+  bottom: 90%; /* Acima do botão */
+  left: 100%; /* Centralizado */
+  margin-left: -15px; /* Para centralizar o triângulo */
+  border-width: 15px; /* Tamanho do triângulo */
   border-style: solid; /* Estilo sólido */
   border-color: transparent transparent #ffae00 transparent; /* Cores do triângulo */
+  transform: rotate(30deg); /* Inclina o triângulo */
+  transform-origin: 0 0; /* Define o ponto de origem da rotação */
 }
 
-button:hover {
-  background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
-}
+
 #closeBtn {
   background-color: #dc3545; /* Vermelho do botão fechar */
   margin-top: 10px;
-  padding: 10px 20px;
+  padding: 5px 13px 5px 15px;
   border-radius: 5px;
   color: white;
+  font-size: 15px;
+  position: fixed;
+  right: 1%;
+  top: 35%;
 }
 
 #closeBtn:hover {
