@@ -284,3 +284,31 @@ body {
   margin-left: 250px;
   /* Empurra o conteúdo para a direita quando a sidebar está ativa */
 }
+<<<<<<< Updated upstream
+=======
+.favorite-button {
+  position: absolute;  /* Certifique-se de que o botão fique acima do overlay */
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;         /* Garante que o botão fique acima de outros elementos */
+  background-color: #f0f0f0;
+  border: none;
+  padding: 5px 8px 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+
+.favorite-button:hover {
+  background-color: #e0e0e0;  /* Efeito de hover para melhorar a usabilidade */
+}
+
+#chatBot{
+  position: fixed; /* Fixa o iframe na tela */
+  bottom: 10px; /* Distância do topo */
+  right: 10px; /* Distância da esquerda */
+  width: 300px; /* Largura do iframe */
+  height: 500px; /* Altura do iframe */
+  z-index: 10; /* Garante que fique acima de outros elementos */
+}
+>>>>>>> Stashed changes
