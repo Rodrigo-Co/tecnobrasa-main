@@ -10,30 +10,47 @@ p {
 
 }
 
+
+/* Estilos das colunas */
+.col-md-4 {
+  flex: 0 0 32%;
+  max-width: 32%;
+  margin-bottom: 30px;
+}
+
 .card {
+  min-height: 490px;
+  min-width: 325px;
   overflow: hidden;
   box-shadow: 0 3px 17px rgba(0, 0, 0, 0.15), 0 0 5px rgba(0, 0, 0, 0.15);
+}
+.card:hover {
+  transform: translateY(-5px);
 }
 .card img {
   width: 100%;
   height: auto !important;
 }
-
-.add-to-cart {
-  display: block;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  text-align: center;
-  font-size: 1.3rem;
-  line-height: 59px;
-  position: absolute;
-  right: 1.25rem;
-  top: -30px;
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
+/* Conteúdo do corpo do cartão */
+.card-body {
+  padding: 20px;
+  color: #333;
 }
-.add-to-cart:hover {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+.card-body h4,
+.card-body h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 10px;
+}
+/* Estilo do parágrafo de descrição */
+.card-body p {
+  font-size: 1rem;
+  color: #666;
+  flex-grow: 1;
+}
+/* Espaço adicional entre os grupos de conteúdo */
+.gap {
+  height: 40px;
 }
 
 .labels {
@@ -108,8 +125,26 @@ p {
   border: none;
   cursor: pointer;
   color: #ffcc00; /* Cor do botão favorito */
+  outline: none;
 }
 
 .favorite-button:hover {
   color: #ff9900; /* Cor ao passar o mouse */
+  outline: none;
+}
+.favorite-button:focus{
+  outline: none;
+}
+/* Configurações de animação e visibilidade */
+.mix {
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Suavidade na transição */
+  opacity: 1;
+  visibility: visible;
+}
+
+.mix-hidden {
+  opacity: 0; /* Deixa o item invisível */
+  visibility: hidden; /* Evita a interatividade com o item */
+  pointer-events: none; /* Impede cliques ou focos */
+  transform: scale(0.8); /* Efeito de zoom ao sair */
 }

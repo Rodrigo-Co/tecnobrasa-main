@@ -71,13 +71,14 @@
                 <div class="row">
                 
                 <div class="col-md-4 mb-3 mb-md-0">
-                <div class="card h-100">
+                <div class="mix word office" data-id="word">
+                <div class="card h-100" >
                 <div class="labels">
                 </div>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="Curso Online">
-                <div class="card-body position-relative d-flex flex-column">
+                <img src="/microsoft-word.png" alt="word" style="width: 66%; display: block; margin: auto; transform: scale(1.05);">
+                <div class="card-body position-relative d-flex flex-column" > 
                 <h4>Word na prática</h4>
-                <p style="color: black; display: block;">Aprendendo Word na prática.</p>
+                <p style="color: black; display: block;">Aprendendo Microsoft Word na prática.</p>
                 <div class="button-container">
                     <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
                         <i class="fa fa-eye" aria-hidden="true"></i>
@@ -88,13 +89,15 @@
                 </div>
                 </div>
             </div>
+            </div>
                    
                 <div class="col-md-4 mb-3 mb-md-0">
-                <div class="card h-100">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="">
+                <div class="mix excel office" data-id="excel">   
+                <div class="card h-100" >
+                <img src="/microsoft-excel.png" alt="excel" style="width: 66%; display: block; margin: auto; transform: scale(1.05);">
                 <div class="card-body position-relative d-flex flex-column">
                 <h4>Excel na prática</h4>
-                <p style="color: black; display: block;">Aprendendo Excel na prática.</p>
+                <p style="color: black; display: block;">Aprendendo Microsoft Excel na prática.</p>
                 <div class="button-container">
                     <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
                         <i class="fa fa-eye" aria-hidden="true"></i>
@@ -105,15 +108,17 @@
                 </div>
                 </div>
             </div>
+            </div>
                     
                 <div class="col-md-4 mb-3 mb-md-0">
-                <div class="card h-100">
+                <div class="mix powerpoint office" data-id="powerpoint">  
+                <div class="card h-100" >
                 <div class="labels"></div>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFmGk5S-fVRy7_WxGkuKrYqHox5ZRusJYLjBX3YtH8e29O07VXdw" alt="Curso Online">
+                <img src="microsoft-power-point.png" alt="PowerPoint" style="width: 66%; display: block; margin: auto; transform: scale(1.1);">
                 <div class="card-body position-relative d-flex flex-column">
-                <h5>PowerPoint na prática</h5>
-                <p style="color: black; display: block;">Aprendendo PT na prática.</p>
-                <div class="button-container">
+                <h4>PowerPoint na prática</h4>
+                <p style="color: black; display: block;">Aprendendo Microsoft Powerpoint na prática.</p>
+                <div style="margin-top: 25px;" class="button-container">
                     <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
                         <i class="fa fa-eye" aria-hidden="true"></i>
                         Assistir aula
@@ -123,58 +128,50 @@
                 </div>
                 </div>
             </div>
-                
+            </div>
+
+                <div class="col-md-4 mb-3 mb-md-0">
+                <div class="mix computadores hardware" data-id="computador"> 
+                <div class="card h-100" >
+                <div class="labels"></div>
+                <img src="/computer-repair2.png" alt="Computadores" style="width: 66%; display: block; margin: auto; transform: scale(1.5);">
+                <div class="card-body position-relative d-flex flex-column">
+                <h4>Montagem e manutenção de computadores</h4>
+                <p style="color: black; display: block;">Montagem e manutenção de computadores na prática.</p>
+                <div class="button-container">
+                    <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Assistir aula
+                    </a>
+                    <button class="favorite-button" onclick="toggleFavorite(event, this, 'computador')">✩</button>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+                <div class="col-md-4 mb-3 mb-md-0">
+                <div class="mix git git" data-id="git">
+                <div class="card h-100" >
+                <div class="labels"></div>
+                <img src="/git-icon2.png" alt="Git" style="width: 66%; display: block; margin: auto;">
+                <div class="card-body position-relative d-flex flex-column">
+                <h4>Git na prática</h4>
+                <p style="color: black; display: block;">Aprendendo Git na prática.</p>
+                <div class="button-container">
+                    <a href="#" class="btn btn-default btn-block mt-auto btn-lg">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        Assistir aula
+                    </a>
+                    <button class="favorite-button" onclick="toggleFavorite(event, this, 'git')">✩</button>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            </div>
         </div>
-
-            <a class="mix word office" href="/word.html" data-id="word">
-                <img class="image" src="/microsoft-word.png">
-                <div class="overlay">
-                    <div class="hover-text">
-                        Word na Prática
-                    </div>
-                </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'word')">✩</button>
-            </a>
-
-            <a class="mix excel office" href="/excel.html" data-id="excel">
-                <img class="image" src="/microsoft-excel.png">
-                <div class="overlay">
-                    <div class="hover-text">
-                        Excel na Prática
-                    </div>
-                </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'excel')">✩</button>
-            </a>
-
-            <a class="mix powerpoint office" href="/ppt.html" data-id="powerpoint">
-                <img class="image" src="/microsoft-power-point.png">
-                <div class="overlay">
-                    <div class="hover-text">
-                        PowerPoint na Prática
-                    </div>
-                </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'powerpoint')">✩</button>
-            </a>
-
-            <a class="mix computadores hardware" href="/computador.html" data-id="computador">
-                <img class="image" src="/computer-repair.png">
-                <div class="overlay">
-                    <div class="hover-text">
-                        Montagem e Manutenção de Computadores
-                    </div>
-                </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'computador')">✩</button>
-            </a>
-
-            <a class="mix git git" href="/git.html" data-id="git">
-                <img class="image" src="/git-icon.png">
-                <div class="overlay">
-                    <div class="hover-text">
-                        Conhecendo o GIT
-                    </div>
-                </div>
-                <button class="favorite-button" onclick="toggleFavorite(event, this, 'git')">✩</button>
-            </a>
+            
 
             <div class="gap"></div>
             <div class="gap"></div>
@@ -186,10 +183,11 @@
     <!-- partial -->
     <script src='https://code.jquery.com/jquery-3.2.1.slim.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js'></script>
-    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js'></script><script  src="/cursos.js"></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
     <script src='https://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.min.js'></script>
     <script>
+        
         $(function () {
             $('#Container').mixItUp();
         });
