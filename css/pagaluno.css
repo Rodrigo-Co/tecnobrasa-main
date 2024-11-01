@@ -284,26 +284,9 @@ body {
   margin-left: 250px;
   /* Empurra o conteúdo para a direita quando a sidebar está ativa */
 }
-<<<<<<< Updated upstream
-=======
-.favorite-button {
-  position: absolute;  /* Certifique-se de que o botão fique acima do overlay */
-  bottom: 10px;
-  right: 10px;
-  z-index: 10;         /* Garante que o botão fique acima de outros elementos */
-  background-color: #f0f0f0;
-  border: none;
-  padding: 5px 8px 5px 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-
-.favorite-button:hover {
-  background-color: #e0e0e0;  /* Efeito de hover para melhorar a usabilidade */
-}
 
 #chatBot{
+  display: none;
   position: fixed; /* Fixa o iframe na tela */
   bottom: 10px; /* Distância do topo */
   right: 10px; /* Distância da esquerda */
@@ -311,4 +294,68 @@ body {
   height: 500px; /* Altura do iframe */
   z-index: 10; /* Garante que fique acima de outros elementos */
 }
->>>>>>> Stashed changes
+
+
+#overlay {
+display: none; /* Inicialmente escondido */
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+justify-content: center;
+align-items: center;
+}
+/* #openBtn { 
+  z-index: 100;
+  display: block;
+  position: fixed;
+  background-color: #007bff; /* Azul do botão 
+  color: white; /* Texto branco 
+  border: none; /* Sem borda 
+  border-radius: 5px; /* Bordas arredondadas 
+  padding: 10px 20px; /* Espaçamento interno 
+  font-size: 16px; /* Tamanho da fonte 
+  cursor: pointer; /* Cursor de ponteiro 
+  transition: background-color 0.3s; /* Transição suave 
+  right: 40px;
+  bottom: 30px;
+ } */
+#openBtn {
+  background-color: #ffae00; /* Cor de fundo */
+  color: white; /* Cor do texto */
+  border: none; /* Sem borda */
+  padding: 10px 20px; /* Espaçamento interno */
+  border-radius: 25px; /* Cantos arredondados */
+  position: fixed; /* Para posicionar o pseudo-elemento */
+  cursor: pointer; /* Mão ao passar o mouse */
+  font-size: 16px; /* Tamanho da fonte */
+  right: 40px;
+  bottom: 30px;
+}
+
+#openBtn::after {
+  content: '';
+  position: absolute;
+  bottom: 100%; /* Acima do botão */
+  left: 90%; /* Centralizado */
+  margin-left: -10px; /* Para centralizar o triângulo */
+  border-width: 10px; /* Tamanho do triângulo */
+  border-style: solid; /* Estilo sólido */
+  border-color: transparent transparent #ffae00 transparent; /* Cores do triângulo */
+}
+
+button:hover {
+  background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+}
+#closeBtn {
+  background-color: #dc3545; /* Vermelho do botão fechar */
+  margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+}
+
+#closeBtn:hover {
+  background-color: #c82333; /* Vermelho mais escuro ao passar o mouse */
+}
