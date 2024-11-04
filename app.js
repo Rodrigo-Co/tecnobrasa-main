@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs'); 
+const PDFDocument = require('pdfkit');
 
 const app = express();
 const port = 3300;
@@ -28,7 +29,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', // Substitua pelo seu usuário do MySQL
-    password: 'cimatec', // Substitua pela sua senha do MySQL
+    password: 'rodrigo', // Substitua pela sua senha do MySQL
     database: 'bancotb', // Nome do seu banco de dados
 });
 
@@ -139,7 +140,7 @@ const transporter = nodemailer.createTransport({
     }
   });
 
-  // Rota para emitir o certificado e enviar o email de notificação
+  // Rota para emitir o certificado preenchido
 app.post('/user/certificado', (req, res) => {
     const { usuarioId, cursoId, nomeCompleto, userEmail } = req.body;
 
@@ -156,19 +157,60 @@ app.post('/user/certificado', (req, res) => {
         return res.status(400).json({ success: false, message: 'Curso não encontrado' });
     }
 
+    // Caminho do modelo de certificado
+    const modeloCertificadoPath = path.join(__dirname, 'img','certificado_modelo.png');
+    const outputFilePath = path.join(__dirname, 'img', 'certificado_preenchido.pdf');
+
+    // Cria um novo documento PDF com o tamanho apropriado do modelo de certificado
+    const doc = new PDFDocument({
+        size: 'A4',
+        layout: 'landscape'
+    });
+
+    // Define a saída do PDF para um arquivo
+    doc.pipe(fs.createWriteStream(outputFilePath));
+
+    // Carrega o modelo de certificado como plano de fundo
+    doc.image(modeloCertificadoPath, 0, 0, { width: doc.page.width, height: doc.page.height });
+
+    // Define o estilo e insere o nome completo, curso e data no PDF sobre o modelo
+    doc.fontSize(24)
+       .font('Helvetica-Bold')
+       .fillColor('#000000')
+       .text(nomeCompleto, 55, 270, { align: 'center' }); // Ajuste as coordenadas conforme necessário
+
+    doc.fontSize(18)
+       .font('Helvetica')
+       .fillColor('#000000')
+       .text(`${nomeCurso}`, 255, 353, { align: 'center' });
+
+    doc.fontSize(14)
+       .text(`${new Date().toLocaleDateString()}`, 186, 495, { align: 'left' });
+
+    // Finaliza o PDF
+    doc.end();
+
+    // Envia o certificado por email
     const mailOptions = {
-        from: 'ttecnobrasa@gmail.com', // Email do remetente
-        to: userEmail, // Email do destinatário (do usuário)
+        from: 'ttecnobrasa@gmail.com',
+        to: userEmail,
         subject: 'Certificado Emitido com Sucesso',
-        text: `Olá, ${nomeCompleto}! 
-
-Parabéns por concluir o curso "${nomeCurso}". Seu certificado foi emitido com sucesso e estará disponível em breve para download.
-
-Atenciosamente,
-Equipe TecnoBrasa`
+        text: `Olá, ${nomeCompleto}!\n\nParabéns por concluir o curso "${nomeCurso}". Seu certificado está em anexo.\n\nAtenciosamente,\nEquipe TecnoBrasa`,
+        attachments: [
+            {
+                filename: 'certificado_preenchido.pdf',
+                path: outputFilePath,
+                contentType: 'application/pdf'
+            }
+        ]
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
+        // Exclui o arquivo temporário após o envio do email
+        fs.unlink(outputFilePath, (err) => {
+            if (err) console.error('Erro ao deletar o arquivo temporário:', err);
+        });
+
         if (error) {
             console.error('Erro ao enviar email:', error);
             return res.status(500).json({ success: false, message: 'Erro ao enviar o email de certificado' });
