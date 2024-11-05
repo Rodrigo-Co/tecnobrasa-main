@@ -251,7 +251,7 @@ body {
   z-index: 1100;
 }
 #linha2 {
-  margin-top: 450px ;
+  margin-top: 200px !important;
   position: fixed;
   background-color: #e69500;
   width: 250px;
