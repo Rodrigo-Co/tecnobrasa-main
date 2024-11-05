@@ -160,6 +160,7 @@ app.post('/user/certificado', (req, res) => {
     // Caminho do modelo de certificado
     const modeloCertificadoPath = path.join(__dirname, 'img','certificado_modelo.png');
     const outputFilePath = path.join(__dirname, 'img', 'certificado_preenchido.pdf');
+    const caligrafiaFontePath = path.join(__dirname, 'fonts', 'GreatVibes-Regular.ttf');
 
     // Cria um novo documento PDF com o tamanho apropriado do modelo de certificado
     const doc = new PDFDocument({
@@ -175,7 +176,7 @@ app.post('/user/certificado', (req, res) => {
 
     // Define o estilo e insere o nome completo, curso e data no PDF sobre o modelo
     doc.fontSize(24)
-       .font('Helvetica-Bold')
+       .font(caligrafiaFontePath)
        .fillColor('#000000')
        .text(nomeCompleto, 55, 270, { align: 'center' }); // Ajuste as coordenadas conforme necessário
 
