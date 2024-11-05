@@ -32,3 +32,12 @@
   background-color: rgba(0, 0, 0, 0.1);
   
 }
+.orange-gap {
+  background-color: orange;
+  height: 10px; /* ajuste a altura conforme necessário */
+  margin-top: -20px;
+}
+#carouselExampleCaptions {
+  margin-top: -5px; /* ajuste conforme necessário */
+  background-color: orange;
+}
