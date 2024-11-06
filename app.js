@@ -148,7 +148,7 @@ app.post('/user/certificado', (req, res) => {
         1: "Word na Prática",
         2: "Excel na Prática",
         3: "PowerPoint na Prática",
-        4: "Montagem e Manutenção de Computadores",
+        4: "Analisando Computadores",
         5: "Conhecendo o GIT"
     };
 
@@ -183,7 +183,7 @@ app.post('/user/certificado', (req, res) => {
     doc.fontSize(18)
        .font('Helvetica')
        .fillColor('#000000')
-       .text(`${nomeCurso}`, 255, 353, { align: 'center' });
+       .text(`${nomeCurso}`, 325, 353, { align: 'center' });
 
     doc.fontSize(14)
        .text(`${new Date().toLocaleDateString()}`, 186, 495, { align: 'left' });
