@@ -27,7 +27,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 .settings-page {
-  background-color: rgb(1, 150, 177);
+  background-color: rgb(55, 190, 231);
   width: 100%;
   min-height: 90vh;
 }
@@ -81,7 +81,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 .settings-page .settings-container .settings-section .my-form .form-group.editable .input-group .btn:hover {
   color: #E59500;
-  background-color: #E5DADA;
+  background-color: #e5e2da;
   
 }
 .settings-page .settings-container .settings-section .my-form .form-group.editable .input-group i {
