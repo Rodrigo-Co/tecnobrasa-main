@@ -21,7 +21,7 @@
           <label class="img-upload btn btn-bwm" id="imageLabel" for="profileImage">
             <div class="img-preview-container">
               <div class="img-preview" id="imgPreview">
-                <img src="/uploads/default-profile.png" alt="Preview" id="imagePreviewElement"> <!-- Coloque uma imagem padrão -->
+                <img src="../uploads/default-profile.png" alt="Preview" id="imagePreviewElement"> <!-- Coloque uma imagem padrão -->
               </div>
             </div>
             <i></i> 
@@ -139,45 +139,6 @@
     });
   });
 
-  // Carregar a imagem do perfil quando a página carregar
-  window.onload = function() {
-    fetch('/user/profile-image')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erro na autenticação ou na requisição de imagem.');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.imageUrl) {
-          previewElement.src = `${data.imageUrl}?t=${new Date().getTime()}`;
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao carregar a imagem do usuário:', error);
-      });
-  };
-  
-  // Quando a página carregar, busca os dados do usuário logado
-  window.onload = function() {
-    fetch('/getData') // Requisição para a rota que busca os dados do usuário
-      .then(response => response.json())
-      .then(data => {
-        // Verifica se houve um erro
-        if (data.error) {
-          console.error('Erro:', data.error);
-        } else {
-          // Insere os dados do usuário nos elementos HTML
-          document.getElementById('userName').innerText = data.nome;
-          document.getElementById('userEmail').innerText = data.email;
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao buscar os dados do usuário:', error);
-        return res.status(401).json({ error: 'Usuário não autenticado' });
-      });
-  };
-
 
 
   const form = document.getElementById('changePasswordForm');
@@ -244,7 +205,44 @@ form.addEventListener('submit', function(event) {
     alert('Erro ao processar a solicitação.');
   });
 });
-
+  
+// Carregar a imagem do perfil quando a página carregar
+window.onload = function() {
+    fetch('/user/profile')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro na autenticação ou na requisição de imagem.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.profileImage) {
+          previewElement.src = `${data.profileImage}?t=${new Date().getTime()}`;
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao carregar a imagem do usuário:', error);
+      });
+      fetch('/getData') // Requisição para a rota que busca os dados do usuário
+      .then(response => response.json())
+      .then(data => {
+        // Verifica se houve um erro
+        if (data.error) {
+          console.error('Erro:', data.error);
+        } else {
+          // Insere os dados do usuário nos elementos HTML
+          document.getElementById('userName').innerText = data.nome;
+          document.getElementById('userEmail').innerText = data.email;
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao buscar os dados do usuário:', error);
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      });
+  };
+  
+  
+        
 const userNameElement = document.getElementById('userName');
 const editIcon = document.getElementById('edit-name');
 let previousUserName = userNameElement.innerText;
